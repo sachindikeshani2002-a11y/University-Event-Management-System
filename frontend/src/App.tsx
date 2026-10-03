@@ -1,13 +1,7 @@
-import Login from "./pages/Login";
+import StudentDashboard from "./pages/StudentDashboard";
 
-
-function App(){
-
-  return(
-    <Login/>
-  )
-
+function App() {
+  return <StudentDashboard />;
 }
-
 
 export default App;

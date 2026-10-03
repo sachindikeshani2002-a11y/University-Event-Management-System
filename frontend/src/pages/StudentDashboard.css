@@ -1,0 +1,960 @@
+* {
+  box-sizing: border-box;
+}
+
+.student-dashboard {
+  min-height: 100vh;
+  display: flex;
+  background: #f5f8fc;
+  color: #17233c;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.dashboard-sidebar {
+  width: 260px;
+  min-height: 100vh;
+
+  background: #09264d;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 28px 16px;
+}
+
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 10px;
+
+  margin-bottom: 45px;
+}
+
+
+.brand-icon {
+  width: 45px;
+  height: 45px;
+
+  border-radius: 12px;
+
+  background: #1675f5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 23px;
+}
+
+
+.sidebar-brand h2 {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+.sidebar-brand p {
+  margin: 3px 0 0;
+
+  font-size: 11px;
+
+  color: #aebed5;
+}
+
+
+/* Navigation */
+
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 13px 15px;
+
+  border-radius: 10px;
+
+  color: #c5d1e4;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  transition: 0.2s;
+}
+
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+}
+
+
+.sidebar-link.active {
+  background: #1675f5;
+
+  color: white;
+}
+
+
+.sidebar-bottom {
+  margin-top: auto;
+
+  border-top: 1px solid rgba(255,255,255,0.15);
+
+  padding-top: 20px;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.dashboard-main {
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+/* =========================
+   TOPBAR
+========================= */
+
+.dashboard-topbar {
+  height: 72px;
+
+  background: white;
+
+  border-bottom: 1px solid #e5eaf1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 32px;
+}
+
+
+.search-container {
+  width: 420px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 14px;
+
+  background: #f6f8fb;
+
+  border: 1px solid #e1e7ef;
+
+  border-radius: 9px;
+
+  color: #7b899e;
+}
+
+
+.search-container input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-size: 13px;
+}
+
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+
+  gap: 25px;
+}
+
+
+.notification-button {
+  position: relative;
+
+  border: none;
+
+  background: transparent;
+
+  color: #53647c;
+
+  cursor: pointer;
+}
+
+
+.notification-badge {
+  position: absolute;
+
+  top: -7px;
+  right: -7px;
+
+  min-width: 16px;
+  height: 16px;
+
+  padding: 0 4px;
+
+  border-radius: 20px;
+
+  background: #ef4444;
+
+  color: white;
+
+  font-size: 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.student-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.student-avatar {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  background: #dbeafe;
+
+  color: #1769d5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+}
+
+
+.student-info strong {
+  display: block;
+
+  font-size: 13px;
+}
+
+
+.student-info span {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  color: #8794a8;
+}
+
+
+/* =========================
+   CONTENT
+========================= */
+
+.dashboard-content {
+  padding: 30px;
+
+  max-width: 1600px;
+
+  margin: auto;
+}
+
+
+.welcome-area {
+  margin-bottom: 25px;
+}
+
+
+.welcome-area h1 {
+  margin: 0 0 7px;
+
+  font-size: 30px;
+
+  font-weight: 750;
+
+  color: #111d36;
+}
+
+
+.welcome-area p {
+  margin: 0;
+
+  color: #718097;
+
+  font-size: 14px;
+}
+
+
+/* =========================
+   STATISTICS
+========================= */
+
+.statistics-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 28px;
+}
+
+
+.stat-card {
+  min-height: 125px;
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  display: flex;
+
+  gap: 15px;
+
+  align-items: flex-start;
+
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+
+.blue-card {
+  background: #eaf3ff;
+}
+
+
+.green-card {
+  background: #eafaf0;
+}
+
+
+.purple-card {
+  background: #f2edff;
+}
+
+
+.orange-card {
+  background: #fff0eb;
+}
+
+
+.stat-icon {
+  width: 43px;
+  height: 43px;
+
+  border-radius: 12px;
+
+  background: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #1769e8;
+}
+
+
+.green-card .stat-icon {
+  color: #16a05d;
+}
+
+
+.purple-card .stat-icon {
+  color: #7c3aed;
+}
+
+
+.orange-card .stat-icon {
+  color: #f05b32;
+}
+
+
+.stat-card span {
+  display: block;
+
+  color: #66768d;
+
+  font-size: 12px;
+}
+
+
+.stat-card h2 {
+  margin: 7px 0 3px;
+
+  font-size: 27px;
+
+  color: #14213a;
+}
+
+
+.stat-card small {
+  color: #4c9a6d;
+
+  font-size: 10px;
+}
+
+
+/* =========================
+   MAIN GRID
+========================= */
+
+.dashboard-grid {
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) 350px;
+
+  gap: 20px;
+
+  align-items: start;
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+.events-section {
+  background: white;
+
+  border: 1px solid #e5eaf1;
+
+  border-radius: 15px;
+
+  padding: 20px;
+}
+
+
+.section-title {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+
+.section-title h2 {
+  margin: 0 0 4px;
+
+  font-size: 19px;
+}
+
+
+.section-title p {
+  margin: 0;
+
+  color: #8793a6;
+
+  font-size: 12px;
+}
+
+
+.section-title button {
+  border: none;
+
+  background: transparent;
+
+  color: #1769e8;
+
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+
+/* Event Card */
+
+.event-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 16px;
+
+  border: 1px solid #e7ebf1;
+
+  border-radius: 12px;
+
+  margin-bottom: 12px;
+
+  transition: 0.2s;
+}
+
+
+.event-card:hover {
+  border-color: #bdd3f5;
+
+  transform: translateY(-1px);
+}
+
+
+.event-date {
+  width: 55px;
+  height: 60px;
+
+  flex-shrink: 0;
+
+  background: #eef5ff;
+
+  color: #1769e8;
+
+  border-radius: 10px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+.event-date strong {
+  font-size: 22px;
+}
+
+
+.event-date span {
+  font-size: 9px;
+
+  font-weight: 700;
+}
+
+
+.event-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.event-category {
+  display: inline-block;
+
+  padding: 4px 8px;
+
+  border-radius: 20px;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  margin-bottom: 5px;
+}
+
+
+.technology {
+  background: #e4f0ff;
+  color: #1670ed;
+}
+
+
+.workshop {
+  background: #eee7ff;
+  color: #713be0;
+}
+
+
+.career {
+  background: #fff0d5;
+  color: #d77b00;
+}
+
+
+.event-content h3 {
+  margin: 0 0 8px;
+
+  font-size: 15px;
+
+  color: #18243b;
+}
+
+
+.event-information {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  color: #77859a;
+
+  font-size: 10px;
+}
+
+
+.event-information span {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+}
+
+
+.details-button {
+  flex-shrink: 0;
+
+  border: none;
+
+  background: #1675f5;
+
+  color: white;
+
+  padding: 9px 12px;
+
+  border-radius: 7px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 3px;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   RIGHT COLUMN
+========================= */
+
+.right-dashboard {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+
+/* =========================
+   CALENDAR
+========================= */
+
+.calendar-card {
+  background: white;
+
+  border: 1px solid #e5eaf1;
+
+  border-radius: 15px;
+
+  padding: 20px;
+}
+
+
+.calendar-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+
+.calendar-header h2 {
+  margin: 0;
+
+  font-size: 17px;
+}
+
+
+.calendar-header div {
+  font-size: 12px;
+
+  color: #66758b;
+
+  font-weight: 600;
+}
+
+
+.calendar-week,
+.calendar-days {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  text-align: center;
+}
+
+
+.calendar-week {
+  margin-bottom: 12px;
+}
+
+
+.calendar-week span {
+  color: #8995a8;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+
+.calendar-days {
+  gap: 5px;
+}
+
+
+.calendar-days span {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: auto;
+
+  font-size: 11px;
+
+  border-radius: 50%;
+}
+
+
+.calendar-days .muted {
+  color: #c0c7d1;
+}
+
+
+.calendar-days .selected-day {
+  background: #1675f5;
+
+  color: white;
+
+  font-weight: 700;
+}
+
+
+.calendar-days .event-day {
+  background: #fff0bf;
+
+  color: #9b6b00;
+
+  font-weight: 700;
+}
+
+
+/* =========================
+   ANNOUNCEMENTS
+========================= */
+
+.announcements-card {
+  background: white;
+
+  border: 1px solid #e5eaf1;
+
+  border-radius: 15px;
+
+  padding: 20px;
+}
+
+
+.announcement-title {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+}
+
+
+.announcement-title h2 {
+  margin: 0;
+
+  font-size: 17px;
+}
+
+
+.announcement-title button {
+  border: none;
+
+  background: transparent;
+
+  color: #1769e8;
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+
+.announcement {
+  display: flex;
+
+  gap: 10px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+
+.announcement:last-child {
+  border-bottom: none;
+}
+
+
+.announcement-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  background: #edf5ff;
+
+  color: #1769e8;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+.announcement strong {
+  display: block;
+
+  font-size: 11px;
+
+  color: #1c2940;
+}
+
+
+.announcement p {
+  margin: 4px 0;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+  color: #77859a;
+}
+
+
+.announcement small {
+  font-size: 9px;
+
+  color: #9aa5b4;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-dashboard {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
+
+@media (max-width: 900px) {
+
+  .dashboard-sidebar {
+    width: 220px;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .dashboard-sidebar {
+    display: none;
+  }
+
+  .dashboard-topbar {
+    padding: 0 15px;
+  }
+
+  .search-container {
+    width: 230px;
+  }
+
+  .student-info {
+    display: none;
+  }
+
+  .dashboard-content {
+    padding: 18px;
+  }
+
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .event-card {
+    flex-wrap: wrap;
+  }
+
+}
