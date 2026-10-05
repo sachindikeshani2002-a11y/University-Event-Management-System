@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+
+import events from "../data/events";
+
 import {
   CalendarDays,
   ClipboardList,
@@ -14,26 +17,43 @@ import StudentLayout from "../components/StudentLayout";
 import "./StudentDashboard.css";
 
 function StudentDashboard() {
+
+  // Get the first 3 events for the dashboard
+  const upcomingEvents = events.slice(0, 3);
+
   return (
     <StudentLayout>
 
       {/* Dashboard Content */}
       <div className="dashboard-content">
 
-        {/* Welcome */}
+        {/* =========================
+            Welcome
+        ========================= */}
+
         <section className="welcome-area">
-          <h1>Welcome back, Asha! 👋</h1>
+
+          <h1>
+            Welcome back, Asha! 👋
+          </h1>
 
           <p>
             Discover events, connect with others, and make the most
             of your university experience.
           </p>
+
         </section>
 
-        {/* Statistics */}
+
+        {/* =========================
+            Statistics
+        ========================= */}
+
         <section className="statistics-grid">
 
+          {/* Total Events */}
           <div className="stat-card blue-card">
+
             <div className="stat-icon">
               <CalendarDays size={22} />
             </div>
@@ -43,9 +63,13 @@ function StudentDashboard() {
               <h2>24</h2>
               <small>Available events</small>
             </div>
+
           </div>
 
+
+          {/* Registered Events */}
           <div className="stat-card green-card">
+
             <div className="stat-icon">
               <ClipboardList size={22} />
             </div>
@@ -55,9 +79,13 @@ function StudentDashboard() {
               <h2>8</h2>
               <small>My registrations</small>
             </div>
+
           </div>
 
+
+          {/* Saved Events */}
           <div className="stat-card purple-card">
+
             <div className="stat-icon">
               <Bookmark size={22} />
             </div>
@@ -67,189 +95,193 @@ function StudentDashboard() {
               <h2>6</h2>
               <small>Saved for later</small>
             </div>
+
           </div>
 
+
+          {/* Upcoming Events */}
           <div className="stat-card orange-card">
+
             <div className="stat-icon">
               <CalendarDays size={22} />
             </div>
 
             <div>
               <span>Upcoming Events</span>
-              <h2>3</h2>
+              <h2>{upcomingEvents.length}</h2>
               <small>Coming soon</small>
             </div>
+
           </div>
 
         </section>
 
-        {/* Main Grid */}
+
+        {/* =========================
+            Main Grid
+        ========================= */}
+
         <div className="dashboard-grid">
 
-          {/* Upcoming Events */}
+
+          {/* =========================
+              Upcoming Events
+          ========================= */}
+
           <section className="events-section">
 
             <div className="section-title">
 
               <div>
-                <h2>Upcoming Events</h2>
-                <p>Events you might be interested in</p>
+
+                <h2>
+                  Upcoming Events
+                </h2>
+
+                <p>
+                  Events you might be interested in
+                </p>
+
               </div>
 
+
               <Link to="/events">
-                View All <ChevronRight size={17} />
+                View All
+                <ChevronRight size={17} />
               </Link>
 
             </div>
 
-            {/* Event 1 */}
-            <div className="event-card">
 
-              <div className="event-date">
-                <strong>05</strong>
-                <span>OCT</span>
-              </div>
+            {/* Dynamic Events */}
 
-              <div className="event-content">
+            {upcomingEvents.map((event) => (
 
-                <span className="event-category technology">
-                  TECHNOLOGY
-                </span>
+              <div
+                className="event-card"
+                key={event.id}
+              >
 
-                <h3>University Tech Conference 2026</h3>
+                {/* Event Date */}
 
-                <div className="event-information">
+                <div className="event-date">
 
-                  <span>
-                    <MapPin size={14} />
-                    Engineering Faculty
-                  </span>
+                  <strong>
+                    {event.date
+                      .split(" ")[1]
+                      .replace(",", "")}
+                  </strong>
 
                   <span>
-                    <Clock size={14} />
-                    9:00 AM - 4:00 PM
-                  </span>
-
-                  <span>
-                    <Users size={14} />
-                    120 Participants
+                    {event.date
+                      .split(" ")[0]
+                      .substring(0, 3)
+                      .toUpperCase()}
                   </span>
 
                 </div>
 
-              </div>
 
-              <button className="details-button">
-                Details
-              </button>
+                {/* Event Content */}
 
-            </div>
+                <div className="event-content">
 
-            {/* Event 2 */}
-            <div className="event-card">
+                  {/* Category */}
 
-              <div className="event-date">
-                <strong>08</strong>
-                <span>OCT</span>
-              </div>
-
-              <div className="event-content">
-
-                <span className="event-category workshop">
-                  WORKSHOP
-                </span>
-
-                <h3>
-                  Introduction to Artificial Intelligence
-                </h3>
-
-                <div className="event-information">
-
-                  <span>
-                    <MapPin size={14} />
-                    ICT Auditorium
+                  <span
+                    className={`event-category ${
+                      event.category === "Technology"
+                        ? "technology"
+                        : event.category === "Workshops"
+                        ? "workshop"
+                        : event.category === "Career"
+                        ? "career"
+                        : ""
+                    }`}
+                  >
+                    {event.category.toUpperCase()}
                   </span>
 
-                  <span>
-                    <Clock size={14} />
-                    10:00 AM - 1:00 PM
-                  </span>
 
-                  <span>
-                    <Users size={14} />
-                    80 Participants
-                  </span>
+                  {/* Event Title */}
+
+                  <h3>
+                    {event.title}
+                  </h3>
+
+
+                  {/* Event Information */}
+
+                  <div className="event-information">
+
+                    <span>
+                      <MapPin size={14} />
+                      {event.location}
+                    </span>
+
+
+                    <span>
+                      <Clock size={14} />
+                      {event.time}
+                    </span>
+
+
+                    <span>
+                      <Users size={14} />
+                      {event.participants}
+                    </span>
+
+                  </div>
 
                 </div>
 
-              </div>
 
-              <button className="details-button">
-                Details
-              </button>
+                {/* Details Button */}
 
-            </div>
-
-            {/* Event 3 */}
-            <div className="event-card">
-
-              <div className="event-date">
-                <strong>12</strong>
-                <span>OCT</span>
-              </div>
-
-              <div className="event-content">
-
-                <span className="event-category career">
-                  CAREER
-                </span>
-
-                <h3>Career & Internship Fair</h3>
-
-                <div className="event-information">
-
-                  <span>
-                    <MapPin size={14} />
-                    University Main Hall
-                  </span>
-
-                  <span>
-                    <Clock size={14} />
-                    9:00 AM - 3:00 PM
-                  </span>
-
-                  <span>
-                    <Users size={14} />
-                    250 Participants
-                  </span>
-
-                </div>
+                <Link
+                  to="/events"
+                  className="details-button"
+                >
+                  Details
+                </Link>
 
               </div>
 
-              <button className="details-button">
-                Details
-              </button>
-
-            </div>
+            ))}
 
           </section>
 
-          {/* Right Column */}
+
+          {/* =========================
+              Right Column
+          ========================= */}
+
           <aside className="right-dashboard">
 
-            {/* Calendar */}
+
+            {/* =========================
+                Calendar
+            ========================= */}
+
             <div className="calendar-card">
 
               <div className="calendar-header">
 
-                <h2>My Calendar</h2>
+                <h2>
+                  My Calendar
+                </h2>
 
-                <div>October 2026</div>
+                <div>
+                  October 2026
+                </div>
 
               </div>
 
+
+              {/* Week Days */}
+
               <div className="calendar-week">
+
                 <span>Sun</span>
                 <span>Mon</span>
                 <span>Tue</span>
@@ -257,34 +289,64 @@ function StudentDashboard() {
                 <span>Thu</span>
                 <span>Fri</span>
                 <span>Sat</span>
+
               </div>
+
+
+              {/* Calendar Days */}
 
               <div className="calendar-days">
 
-                <span className="muted">27</span>
-                <span className="muted">28</span>
-                <span className="muted">29</span>
-                <span className="muted">30</span>
+                <span className="muted">
+                  27
+                </span>
+
+                <span className="muted">
+                  28
+                </span>
+
+                <span className="muted">
+                  29
+                </span>
+
+                <span className="muted">
+                  30
+                </span>
+
 
                 <span>1</span>
                 <span>2</span>
                 <span>3</span>
                 <span>4</span>
 
-                <span className="selected-day">5</span>
+
+                <span className="selected-day">
+                  5
+                </span>
+
                 <span>6</span>
                 <span>7</span>
-                <span className="event-day">8</span>
+
+                <span className="event-day">
+                  8
+                </span>
+
                 <span>9</span>
                 <span>10</span>
 
+
                 <span>11</span>
-                <span className="event-day">12</span>
+
+                <span className="event-day">
+                  12
+                </span>
+
                 <span>13</span>
                 <span>14</span>
                 <span>15</span>
                 <span>16</span>
                 <span>17</span>
+
 
                 <span>18</span>
                 <span>19</span>
@@ -293,6 +355,7 @@ function StudentDashboard() {
                 <span>22</span>
                 <span>23</span>
                 <span>24</span>
+
 
                 <span>25</span>
                 <span>26</span>
@@ -306,13 +369,27 @@ function StudentDashboard() {
 
             </div>
 
-            {/* Announcements */}
+
+            {/* =========================
+                Announcements
+            ========================= */}
+
             <div className="announcements-card">
 
               <div className="announcement-title">
-                <h2>Recent Announcements</h2>
-                <button>View All</button>
+
+                <h2>
+                  Recent Announcements
+                </h2>
+
+                <button>
+                  View All
+                </button>
+
               </div>
+
+
+              {/* Announcement 1 */}
 
               <div className="announcement">
 
@@ -321,16 +398,25 @@ function StudentDashboard() {
                 </div>
 
                 <div>
-                  <strong>New events added</strong>
+
+                  <strong>
+                    New events added
+                  </strong>
 
                   <p>
                     5 new university events are available.
                   </p>
 
-                  <small>2 hours ago</small>
+                  <small>
+                    2 hours ago
+                  </small>
+
                 </div>
 
               </div>
+
+
+              {/* Announcement 2 */}
 
               <div className="announcement">
 
@@ -339,13 +425,19 @@ function StudentDashboard() {
                 </div>
 
                 <div>
-                  <strong>Registration reminder</strong>
+
+                  <strong>
+                    Registration reminder
+                  </strong>
 
                   <p>
                     Don't forget to register for upcoming events.
                   </p>
 
-                  <small>Yesterday</small>
+                  <small>
+                    Yesterday
+                  </small>
+
                 </div>
 
               </div>
