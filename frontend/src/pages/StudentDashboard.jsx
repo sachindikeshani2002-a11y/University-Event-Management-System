@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 import {
-  Home,
+  LayoutDashboard,
   CalendarDays,
   ClipboardList,
-  Heart,
+  Bookmark,
   User,
   Bell,
   LogOut,
@@ -19,123 +20,99 @@ function StudentDashboard() {
   return (
     <div className="student-dashboard">
 
-      {/* ================= SIDEBAR ================= */}
-
+      {/* Sidebar */}
       <aside className="dashboard-sidebar">
 
         <div className="sidebar-brand">
-
           <div className="brand-icon">
-            🎓
+            <LayoutDashboard size={23} />
           </div>
 
           <div>
-            <h2>University Event</h2>
-            <p>Management System</p>
+            <h2>UniEvents</h2>
+            <p>University Event Management</p>
           </div>
-
         </div>
-
-
-        {/* Navigation */}
 
         <nav className="sidebar-navigation">
 
-          <a className="sidebar-link active">
-            <Home size={20} />
-            <span>Dashboard</span>
-          </a>
+          <Link to="/" className="sidebar-link active">
+            <LayoutDashboard size={20} />
+            Dashboard
+          </Link>
 
-          <a className="sidebar-link">
+          <Link to="/events" className="sidebar-link">
             <CalendarDays size={20} />
-            <span>Events</span>
-          </a>
+            Events
+          </Link>
 
           <a className="sidebar-link">
             <ClipboardList size={20} />
-            <span>My Registrations</span>
+            My Registrations
           </a>
 
           <a className="sidebar-link">
-            <Heart size={20} />
-            <span>Saved Events</span>
+            <Bookmark size={20} />
+            Saved Events
           </a>
 
           <a className="sidebar-link">
             <CalendarDays size={20} />
-            <span>Calendar</span>
+            Calendar
           </a>
 
           <a className="sidebar-link">
             <User size={20} />
-            <span>Profile</span>
+            Profile
           </a>
 
           <a className="sidebar-link">
             <Bell size={20} />
-            <span>Notifications</span>
+            Notifications
           </a>
 
         </nav>
 
-
         <div className="sidebar-bottom">
-
           <a className="sidebar-link">
             <LogOut size={20} />
-            <span>Logout</span>
+            Logout
           </a>
-
         </div>
 
       </aside>
 
-
-      {/* ================= MAIN CONTENT ================= */}
-
+      {/* Main */}
       <main className="dashboard-main">
 
-        {/* TOP BAR */}
-
+        {/* Topbar */}
         <header className="dashboard-topbar">
 
           <div className="search-container">
-
-            <Search size={19} />
+            <Search size={20} />
 
             <input
               type="text"
-              placeholder="Search events, categories, or locations..."
+              placeholder="Search events..."
             />
-
           </div>
-
 
           <div className="topbar-right">
 
             <button className="notification-button">
-
               <Bell size={21} />
-
-              <span className="notification-badge">
-                3
-              </span>
-
+              <span className="notification-badge">3</span>
             </button>
-
 
             <div className="student-profile">
 
               <div className="student-avatar">
-                A
+                AP
               </div>
 
               <div className="student-info">
-
                 <strong>Asha Perera</strong>
-
                 <span>Student</span>
-
               </div>
 
             </div>
@@ -144,197 +121,131 @@ function StudentDashboard() {
 
         </header>
 
+        {/* Content */}
+        <div className="dashboard-content">
 
-        {/* ================= PAGE CONTENT ================= */}
+          {/* Welcome */}
+          <section className="welcome-area">
 
-        <section className="dashboard-content">
+            <h1>Welcome back, Asha! 👋</h1>
 
+            <p>
+              Discover events, connect with others, and make the most
+              of your university experience.
+            </p>
 
-          {/* WELCOME */}
+          </section>
 
-          <div className="welcome-area">
-
-            <div>
-
-              <h1>
-                Welcome back, Asha! 👋
-              </h1>
-
-              <p>
-                Discover exciting events, participate in activities
-                and grow your skills.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          {/* ================= STAT CARDS ================= */}
-
-          <div className="statistics-grid">
-
-
-            {/* Total Events */}
+          {/* Statistics */}
+          <section className="statistics-grid">
 
             <div className="stat-card blue-card">
 
               <div className="stat-icon">
-                <CalendarDays size={24} />
+                <CalendarDays size={22} />
               </div>
 
               <div>
-
                 <span>Total Events</span>
-
                 <h2>24</h2>
-
-                <small>
-                  ↑ 12% from last month
-                </small>
-
+                <small>Available events</small>
               </div>
 
             </div>
-
-
-            {/* Registered */}
 
             <div className="stat-card green-card">
 
               <div className="stat-icon">
-                <ClipboardList size={24} />
+                <ClipboardList size={22} />
               </div>
 
               <div>
-
                 <span>Registered Events</span>
-
                 <h2>8</h2>
-
-                <small>
-                  ↑ 2 new this month
-                </small>
-
+                <small>My registrations</small>
               </div>
 
             </div>
-
-
-            {/* Saved */}
 
             <div className="stat-card purple-card">
 
               <div className="stat-icon">
-                <Heart size={24} />
+                <Bookmark size={22} />
               </div>
 
               <div>
-
                 <span>Saved Events</span>
-
                 <h2>6</h2>
-
-                <small>
-                  ↑ 3 new this month
-                </small>
-
+                <small>Saved for later</small>
               </div>
 
             </div>
-
-
-            {/* Upcoming */}
 
             <div className="stat-card orange-card">
 
               <div className="stat-icon">
-                <Clock size={24} />
+                <CalendarDays size={22} />
               </div>
 
               <div>
-
                 <span>Upcoming Events</span>
-
                 <h2>3</h2>
-
-                <small>
-                  Next 7 days
-                </small>
-
+                <small>Coming soon</small>
               </div>
 
             </div>
 
-          </div>
+          </section>
 
-
-          {/* ================= TWO COLUMN AREA ================= */}
-
+          {/* Main Grid */}
           <div className="dashboard-grid">
 
-
-            {/* LEFT - EVENTS */}
-
-            <div className="events-section">
+            {/* Events */}
+            <section className="events-section">
 
               <div className="section-title">
 
                 <div>
-
                   <h2>Upcoming Events</h2>
-
-                  <p>
-                    Don't miss what's happening on campus
-                  </p>
-
+                  <p>Events you might be interested in</p>
                 </div>
 
-                <button>
-                  View all
-                  <ChevronRight size={17} />
-                </button>
+                <Link to="/events">
+                  View All <ChevronRight size={17} />
+                </Link>
 
               </div>
 
-
-              {/* EVENT 1 */}
-
+              {/* Event 1 */}
               <div className="event-card">
 
                 <div className="event-date">
-
                   <strong>05</strong>
-
                   <span>OCT</span>
-
                 </div>
-
 
                 <div className="event-content">
 
                   <span className="event-category technology">
-                    Technology
+                    TECHNOLOGY
                   </span>
 
-                  <h3>
-                    University Tech Conference 2026
-                  </h3>
+                  <h3>University Tech Conference 2026</h3>
 
                   <div className="event-information">
 
                     <span>
-                      <MapPin size={15} />
-                      Main Auditorium
+                      <MapPin size={14} />
+                      Engineering Faculty
                     </span>
 
                     <span>
-                      <Clock size={15} />
+                      <Clock size={14} />
                       9:00 AM - 4:00 PM
                     </span>
 
                     <span>
-                      <Users size={15} />
+                      <Users size={14} />
                       120 Participants
                     </span>
 
@@ -342,32 +253,24 @@ function StudentDashboard() {
 
                 </div>
 
-
                 <button className="details-button">
-                  View Details
-                  <ChevronRight size={16} />
+                  Details
                 </button>
 
               </div>
 
-
-              {/* EVENT 2 */}
-
+              {/* Event 2 */}
               <div className="event-card">
 
                 <div className="event-date">
-
                   <strong>08</strong>
-
                   <span>OCT</span>
-
                 </div>
-
 
                 <div className="event-content">
 
                   <span className="event-category workshop">
-                    Workshop
+                    WORKSHOP
                   </span>
 
                   <h3>
@@ -377,110 +280,90 @@ function StudentDashboard() {
                   <div className="event-information">
 
                     <span>
-                      <MapPin size={15} />
-                      Computer Engineering Faculty
+                      <MapPin size={14} />
+                      ICT Auditorium
                     </span>
 
                     <span>
-                      <Clock size={15} />
+                      <Clock size={14} />
                       10:00 AM - 1:00 PM
                     </span>
 
                     <span>
-                      <Users size={15} />
-                      60 Participants
+                      <Users size={14} />
+                      80 Participants
                     </span>
 
                   </div>
 
                 </div>
 
-
                 <button className="details-button">
-                  View Details
-                  <ChevronRight size={16} />
+                  Details
                 </button>
 
               </div>
 
-
-              {/* EVENT 3 */}
-
+              {/* Event 3 */}
               <div className="event-card">
 
                 <div className="event-date">
-
                   <strong>12</strong>
-
                   <span>OCT</span>
-
                 </div>
-
 
                 <div className="event-content">
 
                   <span className="event-category career">
-                    Career
+                    CAREER
                   </span>
 
-                  <h3>
-                    Career & Internship Fair
-                  </h3>
+                  <h3>Career & Internship Fair</h3>
 
                   <div className="event-information">
 
                     <span>
-                      <MapPin size={15} />
-                      University Grounds
+                      <MapPin size={14} />
+                      University Main Hall
                     </span>
 
                     <span>
-                      <Clock size={15} />
-                      8:30 AM - 5:00 PM
+                      <Clock size={14} />
+                      9:00 AM - 3:00 PM
                     </span>
 
                     <span>
-                      <Users size={15} />
-                      300 Participants
+                      <Users size={14} />
+                      250 Participants
                     </span>
 
                   </div>
 
                 </div>
 
-
                 <button className="details-button">
-                  View Details
-                  <ChevronRight size={16} />
+                  Details
                 </button>
 
               </div>
 
-            </div>
+            </section>
 
+            {/* Right Column */}
+            <aside className="right-dashboard">
 
-            {/* ================= RIGHT SIDE ================= */}
-
-            <div className="right-dashboard">
-
-
-              {/* EVENT CALENDAR */}
-
+              {/* Calendar */}
               <div className="calendar-card">
 
                 <div className="calendar-header">
 
                   <h2>My Calendar</h2>
 
-                  <div>
-                    October 2026
-                  </div>
+                  <div>October 2026</div>
 
                 </div>
 
-
                 <div className="calendar-week">
-
                   <span>Sun</span>
                   <span>Mon</span>
                   <span>Tue</span>
@@ -488,9 +371,7 @@ function StudentDashboard() {
                   <span>Thu</span>
                   <span>Fri</span>
                   <span>Sat</span>
-
                 </div>
-
 
                 <div className="calendar-days">
 
@@ -502,8 +383,8 @@ function StudentDashboard() {
                   <span>1</span>
                   <span>2</span>
                   <span>3</span>
-
                   <span>4</span>
+
                   <span className="selected-day">5</span>
                   <span>6</span>
                   <span>7</span>
@@ -539,103 +420,60 @@ function StudentDashboard() {
 
               </div>
 
-
-              {/* ANNOUNCEMENTS */}
-
+              {/* Announcements */}
               <div className="announcements-card">
 
                 <div className="announcement-title">
 
                   <h2>Recent Announcements</h2>
 
-                  <button>
-                    View all
-                  </button>
+                  <button>View All</button>
 
                 </div>
-
 
                 <div className="announcement">
 
                   <div className="announcement-icon">
-                    <Bell size={17} />
+                    <Bell size={16} />
                   </div>
 
                   <div>
-
-                    <strong>
-                      Tech Conference Registration Open
-                    </strong>
+                    <strong>New events added</strong>
 
                     <p>
-                      Join us for the biggest tech event this year!
+                      5 new university events are available.
                     </p>
 
-                    <small>
-                      2 Oct 2026
-                    </small>
-
+                    <small>2 hours ago</small>
                   </div>
 
                 </div>
 
-
                 <div className="announcement">
 
                   <div className="announcement-icon">
-                    <CalendarDays size={17} />
+                    <Bell size={16} />
                   </div>
 
                   <div>
-
-                    <strong>
-                      Workshop Schedule Released
-                    </strong>
+                    <strong>Registration reminder</strong>
 
                     <p>
-                      Check the full schedule for AI workshops.
+                      Don't forget to register for upcoming events.
                     </p>
 
-                    <small>
-                      30 Sep 2026
-                    </small>
-
-                  </div>
-
-                </div>
-
-
-                <div className="announcement">
-
-                  <div className="announcement-icon">
-                    <CalendarDays size={17} />
-                  </div>
-
-                  <div>
-
-                    <strong>
-                      New Events Added
-                    </strong>
-
-                    <p>
-                      Discover the latest events on campus.
-                    </p>
-
-                    <small>
-                      28 Sep 2026
-                    </small>
-
+                    <small>Yesterday</small>
                   </div>
 
                 </div>
 
               </div>
 
-            </div>
+            </aside>
 
           </div>
 
-        </section>
+        </div>
 
       </main>
 
