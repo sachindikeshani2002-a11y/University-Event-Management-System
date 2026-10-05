@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -9,16 +10,18 @@ import {
   LogOut,
   Search,
 } from "lucide-react";
+import "../pages/StudentDashboard.css";
 
 function StudentLayout({ children }) {
+  const [logoutMessage, setLogoutMessage] = useState("");
   const location = useLocation();
+
+  const navLinkClass = ({ isActive }) =>
+    `sidebar-link ${isActive ? "active" : ""}`;
 
   return (
     <div className="student-dashboard">
-
-      {/* Sidebar */}
       <aside className="dashboard-sidebar">
-
         <div className="sidebar-brand">
           <div className="brand-icon">
             <LayoutDashboard size={23} />
@@ -31,107 +34,88 @@ function StudentLayout({ children }) {
         </div>
 
         <nav className="sidebar-navigation">
-
-          <Link
-            to="/"
-            className={`sidebar-link ${
-              location.pathname === "/" ? "active" : ""
-            }`}
-          >
+          <NavLink to="/" className={navLinkClass}>
             <LayoutDashboard size={20} />
             Dashboard
-          </Link>
+          </NavLink>
 
-          <Link
-            to="/events"
-            className={`sidebar-link ${
-              location.pathname === "/events" ? "active" : ""
-            }`}
-          >
+          <NavLink to="/events" className={navLinkClass}>
             <CalendarDays size={20} />
             Events
-          </Link>
+          </NavLink>
 
-          <a className="sidebar-link">
+          <NavLink to="/registrations" className={navLinkClass}>
             <ClipboardList size={20} />
             My Registrations
-          </a>
+          </NavLink>
 
-          <a className="sidebar-link">
+          <NavLink to="/saved-events" className={navLinkClass}>
             <Bookmark size={20} />
             Saved Events
-          </a>
+          </NavLink>
 
-          <a className="sidebar-link">
+          <Link
+            to="/calendar"
+            className={`sidebar-link ${location.pathname === "/calendar" ? "active" : ""}`}
+          >
             <CalendarDays size={20} />
             Calendar
-          </a>
+          </Link>
 
-          <a className="sidebar-link">
+          <NavLink to="/profile" className={navLinkClass}>
             <User size={20} />
             Profile
-          </a>
+          </NavLink>
 
-          <a className="sidebar-link">
+          <NavLink to="/notifications" className={navLinkClass}>
             <Bell size={20} />
             Notifications
-          </a>
-
+          </NavLink>
         </nav>
 
         <div className="sidebar-bottom">
-          <a className="sidebar-link">
+          <button
+            type="button"
+            className="sidebar-link logout-button"
+            onClick={() =>
+              setLogoutMessage(
+                "Logout functionality will be connected when authentication is implemented."
+              )
+            }
+          >
             <LogOut size={20} />
             Logout
-          </a>
+          </button>
+          {logoutMessage && <p className="logout-message">{logoutMessage}</p>}
         </div>
-
       </aside>
 
-      {/* Main */}
       <main className="dashboard-main">
-
-        {/* Topbar */}
         <header className="dashboard-topbar">
-
           <div className="search-container">
             <Search size={20} />
-
-            <input
-              type="text"
-              placeholder="Search events..."
-            />
+            <input type="text" placeholder="Search events..." />
           </div>
 
           <div className="topbar-right">
-
-            <button className="notification-button">
+            <button className="notification-button" type="button">
               <Bell size={21} />
               <span className="notification-badge">3</span>
             </button>
 
             <div className="student-profile">
-
-              <div className="student-avatar">
-                AP
-              </div>
+              <div className="student-avatar">AP</div>
 
               <div className="student-info">
                 <strong>Asha Perera</strong>
                 <span>Student</span>
               </div>
-
             </div>
-
           </div>
-
         </header>
 
-        {/* Page Content */}
         {children}
-
       </main>
-
     </div>
   );
 }

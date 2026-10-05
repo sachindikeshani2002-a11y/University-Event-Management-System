@@ -1,0 +1,161 @@
+.page-shell {
+  padding: 30px;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 6px;
+  font-size: 30px;
+  color: #111d36;
+}
+
+.page-header p {
+  margin: 0;
+  color: #718097;
+  font-size: 14px;
+}
+
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.empty-state-card {
+  background: white;
+  border: 1px solid #e5eaf1;
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 560px;
+}
+
+.empty-state-card h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #18243b;
+}
+
+.empty-state-card p {
+  margin: 0 0 18px;
+  color: #77859a;
+  line-height: 1.6;
+}
+
+.primary-action-button,
+.secondary-link-button,
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-action-button {
+  background: #1675f5;
+  color: white;
+  padding: 11px 18px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.secondary-link-button {
+  background: #edf5ff;
+  color: #1769e8;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.link-button {
+  background: transparent;
+  color: #18243b;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.info-card {
+  background: white;
+  border: 1px solid #e5eaf1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.info-card-banner {
+  height: 110px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.info-card-banner span {
+  background: white;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.technology-banner {
+  background: #dcecff;
+}
+
+.workshop-banner {
+  background: #eee5ff;
+}
+
+.career-banner {
+  background: #fff0d5;
+}
+
+.info-card-body {
+  padding: 20px;
+}
+
+.info-card-body h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #18243b;
+}
+
+.info-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.info-meta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #77859a;
+  font-size: 11px;
+}
+
+.info-card-body p {
+  margin: 0 0 18px;
+  color: #77859a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .page-shell {
+    padding: 18px;
+  }
+
+  .list-grid {
+    grid-template-columns: 1fr;
+  }
+}

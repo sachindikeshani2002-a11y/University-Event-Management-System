@@ -90,17 +90,22 @@
 
   gap: 14px;
 
+  width: 100%;
   padding: 13px 15px;
 
+  border: none;
   border-radius: 10px;
 
+  background: transparent;
   color: #c5d1e4;
 
   text-decoration: none;
+  text-align: left;
 
   cursor: pointer;
 
   font-size: 14px;
+  font-family: inherit;
 
   transition: 0.2s;
 }
@@ -117,6 +122,28 @@
   background: #1675f5;
 
   color: white;
+}
+
+.sidebar-link.static-link {
+  pointer-events: none;
+  cursor: default;
+}
+
+.sidebar-link.static-link:hover {
+  background: transparent;
+  color: #c5d1e4;
+}
+
+.sidebar-link.logout-button {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.logout-message {
+  margin: 12px 0 0;
+  color: #fef3c7;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 
@@ -744,7 +771,8 @@
 }
 
 
-.calendar-days span {
+.calendar-days .calendar-day,
+.calendar-days .muted {
   width: 30px;
   height: 30px;
 
@@ -760,6 +788,13 @@
   border-radius: 50%;
 }
 
+.calendar-days .calendar-day {
+  border: none;
+  background: transparent;
+  color: #2b3d54;
+  cursor: pointer;
+  font-weight: 600;
+}
 
 .calendar-days .muted {
   color: #c0c7d1;
@@ -781,6 +816,62 @@
   color: #9b6b00;
 
   font-weight: 700;
+}
+
+.calendar-selected-events {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f4;
+}
+
+.calendar-selected-events h3 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #18243b;
+}
+
+.calendar-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calendar-event-item {
+  padding: 12px;
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+  background: #f9fbff;
+}
+
+.calendar-event-item h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #18243b;
+}
+
+.calendar-event-category {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: #eaf3ff;
+  color: #1769e8;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.calendar-event-item p {
+  margin: 4px 0;
+  color: #77859a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.calendar-empty-state {
+  margin: 0;
+  color: #77859a;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 
