@@ -1,0 +1,19 @@
+.organizer-events-table {
+  min-width: 790px;
+}
+
+.organizer-events-table th:last-child,
+.organizer-events-table td:last-child {
+  width: 130px;
+  text-align: right;
+}
+
+.organizer-notice-dismiss {
+  float: right;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}

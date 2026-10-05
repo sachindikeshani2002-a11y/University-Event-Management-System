@@ -1,0 +1,66 @@
+.organizer-notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.organizer-notification-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+}
+
+.organizer-notification-card.is-unread {
+  border-left: 3px solid #1675f5;
+  background: #fbfdff;
+}
+
+.organizer-notification-card.is-read {
+  opacity: 0.78;
+}
+
+.organizer-notification-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eaf2ff;
+  color: #1769e8;
+}
+
+.organizer-notification-copy p {
+  margin: 5px 0 7px;
+  color: #718097;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.organizer-notification-copy time {
+  color: #8995a8;
+  font-size: 10px;
+}
+
+.organizer-notification-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.organizer-notification-title h2 {
+  margin: 0;
+  color: #18243b;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+@media (max-width: 520px) {
+  .organizer-notification-card {
+    grid-template-columns: 32px minmax(0, 1fr) 30px;
+    gap: 9px;
+    padding: 12px;
+  }
+}
