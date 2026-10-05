@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import StudentLayout from "../components/StudentLayout";
 import events from "../data/events";
 import { useStudent } from "../context/StudentContext";
@@ -16,12 +17,17 @@ import {
 import "./Events.css";
 
 function Events() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
   const [selectedCategory, setSelectedCategory] = useState("All Events");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registrationMessage, setRegistrationMessage] = useState("");
 
   const { savedEvents, registeredEvents, toggleSaveEvent, registerForEvent } = useStudent();
+
+  useEffect(() => {
+    setSearchTerm(searchParams.get("search") ?? "");
+  }, [searchParams]);
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =

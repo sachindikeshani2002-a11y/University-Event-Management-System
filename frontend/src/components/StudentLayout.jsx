@@ -3,12 +3,12 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
+  GraduationCap,
   ClipboardList,
   Bookmark,
   User,
   Bell,
   LogOut,
-  Search,
 } from "lucide-react";
 import "../pages/StudentDashboard.css";
 
@@ -24,12 +24,12 @@ function StudentLayout({ children }) {
       <aside className="dashboard-sidebar">
         <div className="sidebar-brand">
           <div className="brand-icon">
-            <LayoutDashboard size={23} />
+            <GraduationCap size={25} aria-hidden="true" />
           </div>
 
-          <div>
-            <h2>UniEvents</h2>
-            <p>University Event Management</p>
+          <div className="brand-copy">
+            <h2>University Event</h2>
+            <p>Management System</p>
           </div>
         </div>
 
@@ -92,16 +92,16 @@ function StudentLayout({ children }) {
 
       <main className="dashboard-main">
         <header className="dashboard-topbar">
-          <div className="search-container">
-            <Search size={20} />
-            <input type="text" placeholder="Search events..." />
-          </div>
-
           <div className="topbar-right">
-            <button className="notification-button" type="button">
-              <Bell size={21} />
-              <span className="notification-badge">3</span>
-            </button>
+            <Link
+              to="/notifications"
+              className="notification-button"
+              aria-label="View notifications"
+              title="View notifications"
+            >
+              <Bell size={21} aria-hidden="true" />
+              <span className="notification-badge" aria-hidden="true">3</span>
+            </Link>
 
             <div className="student-profile">
               <div className="student-avatar">AP</div>
