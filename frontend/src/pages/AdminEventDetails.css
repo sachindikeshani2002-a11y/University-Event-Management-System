@@ -1,0 +1,16 @@
+.admin-back-link { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 12px; color: #61728a; font-size: 9px; font-weight: 700; text-decoration: none; }
+.admin-event-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .72fr); align-items: start; gap: 13px; }
+.admin-event-description, .admin-event-facts { padding: 17px; }
+.admin-event-description h2, .admin-event-facts h2 { margin: 15px 0 8px; color: #18243b; font-size: 13px; letter-spacing: 0; }
+.admin-event-description p { color: #718097; font-size: 10px; line-height: 1.6; }
+.admin-event-facts h2 { margin-top: 0; margin-bottom: 11px; }
+.admin-event-facts > div { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid #edf0f4; color: #1769e8; }
+.admin-event-facts > div > span:not(.admin-fact-spacer) { display: flex; flex-direction: column; gap: 3px; }
+.admin-event-facts small { color: #8794a8; font-size: 8px; }
+.admin-event-facts strong { color: #344862; font-size: 9px; font-weight: 600; }
+.admin-fact-spacer { flex: 0 0 16px; }
+.admin-rejection-note { margin-top: 17px; padding: 10px; border: 1px solid #f4d3d6; border-radius: 6px; background: #fff8f8; }
+.admin-rejection-note strong { color: #a62f3d; font-size: 9px; }
+.admin-rejection-note p { margin-top: 4px; }
+@media (max-width: 780px) { .admin-event-detail-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .admin-page-header-action { justify-content: flex-start; } }

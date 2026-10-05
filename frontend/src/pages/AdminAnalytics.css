@@ -1,0 +1,15 @@
+.admin-analytics-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.admin-stat-copy strong.compact { display: -webkit-box; overflow: hidden; font-size: 12px; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.admin-analytics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; }
+.admin-chart-list { display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+.admin-chart-row { display: grid; gap: 6px; }
+.admin-chart-label { display: flex; justify-content: space-between; gap: 9px; color: #5b6b81; font-size: 9px; }
+.admin-chart-label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-chart-label strong, .admin-category-chart-row strong { color: #344862; font-size: 9px; }
+.admin-chart-track { height: 7px; overflow: hidden; border-radius: 8px; background: #edf2f8; }
+.admin-chart-track span { display: block; min-width: 2px; height: 100%; border-radius: inherit; background: #287df1; }
+.admin-category-chart-row { display: grid; grid-template-columns: minmax(74px, auto) minmax(40px, 1fr) 15px; align-items: center; gap: 9px; color: #5b6b81; font-size: 9px; }
+.admin-category-chart-row span.status-cancelled { background: #dc6870; }
+.admin-category-chart-row span.status-attended { background: #3c9c64; }
+@media (max-width: 1000px) { .admin-analytics-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .admin-analytics-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
