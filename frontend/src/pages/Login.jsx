@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   BarChart3,
   CalendarDays,
@@ -11,16 +12,9 @@ import {
 } from "lucide-react";
 import "./Login.css";
 
-function getMockRoleFromEmail(email) {
-  // Temporary frontend-only role selection for testing; no real authentication is performed.
-  const username = email.trim().split("@")[0]?.toLowerCase();
-  if (username === "admin") return "admin";
-  if (username === "organizer") return "organizer";
-  return "student";
-}
-
-function Login({ onLoginSuccess }) {
+function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -39,8 +33,7 @@ function Login({ onLoginSuccess }) {
       return;
     }
 
-    const mockRole = getMockRoleFromEmail(email);
-    onLoginSuccess(mockRole);
+    const mockRole = login(email);
     setValidationMessage("");
 
     const routeMap = {

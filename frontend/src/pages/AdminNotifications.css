@@ -1,0 +1,10 @@
+.admin-notification-list { display: flex; flex-direction: column; gap: 9px; }
+.admin-notification-item { display: grid; grid-template-columns: 36px minmax(0, 1fr) 30px; align-items: center; gap: 11px; padding: 13px; }
+.admin-notification-item.unread { border-left: 3px solid #1675f5; background: #fbfdff; }
+.admin-notification-item.read { opacity: .78; }
+.admin-notification-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 7px; background: #eaf2ff; color: #1769e8; }
+.admin-notification-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.admin-notification-title h2 { margin: 0; color: #18243b; font-size: 11px; letter-spacing: 0; }
+.admin-notification-copy p { margin: 4px 0 6px; color: #718097; font-size: 9px; line-height: 1.5; }
+.admin-notification-copy time { color: #8794a8; font-size: 8px; }
+@media (max-width: 520px) { .admin-notification-item { grid-template-columns: 30px minmax(0, 1fr) 28px; gap: 8px; padding: 10px; } }

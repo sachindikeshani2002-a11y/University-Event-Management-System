@@ -1,0 +1,4 @@
+.admin-students-table { min-width: 850px; }
+.admin-icon-actions { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 6px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #61728a; font: inherit; font-size: 8px; cursor: pointer; }
+.admin-icon-actions:hover { border-color: var(--admin-border); background: #f5f8fc; color: #17233c; }
+.admin-icon-actions:focus-visible { outline: 2px solid var(--admin-blue); outline-offset: 2px; }

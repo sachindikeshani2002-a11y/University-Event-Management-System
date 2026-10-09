@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -13,8 +13,13 @@ import {
 import "../pages/StudentDashboard.css";
 
 function StudentLayout({ children }) {
-  const [logoutMessage, setLogoutMessage] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   const navLinkClass = ({ isActive }) =>
     `sidebar-link ${isActive ? "active" : ""}`;
@@ -77,22 +82,21 @@ function StudentLayout({ children }) {
           <button
             type="button"
             className="sidebar-link logout-button"
-            onClick={() =>
-              setLogoutMessage(
-                "Logout functionality will be connected when authentication is implemented."
-              )
-            }
+            onClick={handleLogout}
           >
             <LogOut size={20} />
             Logout
           </button>
-          {logoutMessage && <p className="logout-message">{logoutMessage}</p>}
         </div>
       </aside>
 
       <main className="dashboard-main">
         <header className="dashboard-topbar">
           <div className="topbar-right">
+            <button type="button" className="mobile-logout-button" onClick={handleLogout}>
+              <LogOut size={16} aria-hidden="true" />
+              Logout
+            </button>
             <Link
               to="/notifications"
               className="notification-button"

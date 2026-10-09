@@ -8,6 +8,28 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    rules: {
+      'react-refresh/only-export-components': [
+        'error',
+        { allowExportNames: ['useAuth', 'useStudent', 'useOrganizer', 'useAdmin'] },
+      ],
+    },
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,

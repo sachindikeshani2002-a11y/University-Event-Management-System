@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const StudentContext = createContext(null);
 
@@ -29,18 +29,13 @@ export function StudentProvider({ children }) {
     return true;
   };
 
-  const value = useMemo(
-    () => ({
+  return (
+    <StudentContext.Provider value={{
       savedEvents,
       registeredEvents,
       toggleSaveEvent,
       registerForEvent,
-    }),
-    [savedEvents, registeredEvents]
-  );
-
-  return (
-    <StudentContext.Provider value={value}>
+    }}>
       {children}
     </StudentContext.Provider>
   );

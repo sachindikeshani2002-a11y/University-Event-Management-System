@@ -200,6 +200,18 @@
   gap: 25px;
 }
 
+.mobile-logout-button {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 1px solid #d7e0ed;
+  border-radius: 8px;
+  background: white;
+  color: #31506f;
+  font-size: 13px;
+}
+
 
 .notification-button {
   position: relative;
@@ -1010,6 +1022,10 @@
 
   .student-info {
     display: none;
+  }
+
+  .mobile-logout-button {
+    display: inline-flex;
   }
 
   .dashboard-content {

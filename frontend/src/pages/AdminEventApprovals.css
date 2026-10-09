@@ -1,0 +1,10 @@
+.admin-approvals-table { min-width: 800px; }
+.admin-approval-count { margin-left: auto; color: #64748b; font-size: 10px; font-weight: 700; }
+.admin-icon-button.approve { color: #24834a; }
+.admin-icon-button.approve:hover { border-color: #c5e8d0; background: #effaf3; }
+.admin-review-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.admin-review-summary > div { padding: 9px; border: 1px solid #edf0f4; border-radius: 5px; }
+.admin-review-summary span { display: block; margin-bottom: 4px; color: #8794a8; font-size: 8px; font-weight: 700; text-transform: uppercase; }
+.admin-review-summary strong { color: #344862; font-size: 10px; }
+.admin-review-description { margin-top: 12px; color: #718097; font-size: 10px; line-height: 1.55; }
+.admin-modal-actions .admin-button:disabled { opacity: .55; cursor: not-allowed; }

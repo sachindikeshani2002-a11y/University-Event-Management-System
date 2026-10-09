@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import StudentLayout from "../components/StudentLayout";
 import events from "../data/events";
@@ -17,17 +17,13 @@ import {
 import "./Events.css";
 
 function Events() {
-  const [searchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") ?? "";
   const [selectedCategory, setSelectedCategory] = useState("All Events");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registrationMessage, setRegistrationMessage] = useState("");
 
   const { savedEvents, registeredEvents, toggleSaveEvent, registerForEvent } = useStudent();
-
-  useEffect(() => {
-    setSearchTerm(searchParams.get("search") ?? "");
-  }, [searchParams]);
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -69,6 +65,16 @@ function Events() {
     }
   };
 
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+      if (value) nextParams.set("search", value);
+      else nextParams.delete("search");
+      return nextParams;
+    }, { replace: true });
+  };
+
   return (
     <StudentLayout>
       <div className="events-page">
@@ -84,7 +90,7 @@ function Events() {
               type="text"
               placeholder="Search events..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
