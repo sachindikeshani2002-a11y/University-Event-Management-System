@@ -297,6 +297,39 @@ button {
   margin-left: 5px;
 }
 
+.login-validation {
+  margin: 0 0 12px;
+  color: #a32121;
+  font-size: 14px;
+  text-align: left;
+}
+
+.mock-login-hint {
+  margin-top: 14px;
+  color: #657286;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.mock-portal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f6f9ff 0%, #e9f0ff 100%);
+  color: #153250;
+  text-align: center;
+}
+
+.mock-portal h1 {
+  margin: 0;
+  color: #153250;
+}
+
 .dashboard-shell {
   min-height: 100vh;
   display: flex;

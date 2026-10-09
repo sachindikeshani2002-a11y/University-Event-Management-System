@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BarChart3,
@@ -11,37 +11,43 @@ import {
 } from "lucide-react";
 import "./Login.css";
 
-type UserRole = "student" | "organizer" | "admin";
-
-type LoginProps = {
-  onLoginSuccess: (role: UserRole) => void;
-};
-
-function getMockRoleFromEmail(email: string): UserRole {
+function getMockRoleFromEmail(email) {
+  // Temporary frontend-only role selection for testing; no real authentication is performed.
   const username = email.trim().split("@")[0]?.toLowerCase();
   if (username === "admin") return "admin";
   if (username === "organizer") return "organizer";
   return "student";
 }
 
-function Login({ onLoginSuccess }: LoginProps) {
+function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (!email.trim()) {
+      setValidationMessage("Please enter your email.");
+      return;
+    }
+    if (!password.trim()) {
+      setValidationMessage("Please enter your password.");
+      return;
+    }
+
     const mockRole = getMockRoleFromEmail(email);
     onLoginSuccess(mockRole);
+    setValidationMessage("");
 
-    const routeMap: Record<UserRole, string> = {
+    const routeMap = {
       student: "/",
       organizer: "/organizer",
       admin: "/admin",
     };
-
     navigate(routeMap[mockRole], { replace: true });
   };
 
@@ -107,6 +113,12 @@ function Login({ onLoginSuccess }: LoginProps) {
         <p>Login to your account</p>
 
         <form className="login-form" onSubmit={handleSubmit}>
+          {validationMessage && (
+            <p className="login-validation" role="alert">
+              {validationMessage}
+            </p>
+          )}
+
           <label className="input-box">
             <Mail />
             <input
@@ -115,6 +127,7 @@ function Login({ onLoginSuccess }: LoginProps) {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Enter your email"
               aria-label="Email"
+              required
             />
           </label>
 
@@ -126,11 +139,12 @@ function Login({ onLoginSuccess }: LoginProps) {
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Enter your password"
               aria-label="Password"
+              required
             />
             <button
               type="button"
               className="password-toggle"
-              onClick={() => setShowPassword((current) => !current)}
+              onClick={() => setShowPassword((visible) => !visible)}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -167,6 +181,12 @@ function Login({ onLoginSuccess }: LoginProps) {
             <button type="button" className="register-link" onClick={handleRegister}>
               Register here
             </button>
+          </p>
+
+          <p className="mock-login-hint">
+            Temporary mock login: <strong>admin@mock.test</strong> opens Admin,
+            <strong> organizer@mock.test</strong> opens Organizer, and any other email opens Student.
+            Any non-empty password works.
           </p>
         </form>
       </div>
