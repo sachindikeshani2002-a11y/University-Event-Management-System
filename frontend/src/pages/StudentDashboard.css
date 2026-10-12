@@ -3,11 +3,21 @@
 }
 
 .student-dashboard {
-  min-height: 100vh;
+  --student-navy: #09264d;
+  --student-blue: #1675f5;
+  --student-text: #17233c;
+  --student-muted: #718097;
+  --student-border: #e3e9f1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   display: flex;
+  overflow: hidden;
   background: #f5f8fc;
-  color: #17233c;
+  color: var(--student-text);
   font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
 }
 
 
@@ -16,68 +26,61 @@
 ========================= */
 
 .dashboard-sidebar {
-  width: 260px;
-  min-height: 100vh;
-
-  background: #09264d;
-  color: white;
-
+  z-index: 30;
   display: flex;
+  flex: 0 0 252px;
   flex-direction: column;
-
-  padding: 28px 16px;
+  width: 252px;
+  height: 100%;
+  min-height: 0;
+  padding: 20px 13px 16px;
+  overflow: hidden;
+  background: var(--student-navy);
+  color: #fff;
 }
 
 
 .sidebar-brand {
   display: flex;
   align-items: center;
-
-  gap: 12px;
-
-  padding: 0 10px;
-
-  margin-bottom: 45px;
+  flex: 0 0 auto;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 4px 25px;
+  color: #fff;
+  text-decoration: none;
 }
 
 
 .brand-icon {
-  flex: 0 0 45px;
-  width: 45px;
-  height: 45px;
-
-  border-radius: 12px;
-
-  background: #1675f5;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 23px;
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--student-blue);
+  color: #fff;
 }
 
 
 .brand-copy {
+  display: flex;
   min-width: 0;
+  flex-direction: column;
+  gap: 3px;
 }
 
 
-.sidebar-brand h2 {
-  margin: 0;
-
-  font-size: 14px;
-  font-weight: 700;
+.brand-copy strong {
+  font-size: 12px;
   line-height: 1.25;
 }
 
 
-.sidebar-brand p {
-  margin: 3px 0 0;
-
-  font-size: 11px;
-
-  color: #aebed5;
+.brand-copy span {
+  color: #b9c9df;
+  font-size: 10px;
 }
 
 
@@ -85,50 +88,54 @@
 
 .sidebar-navigation {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-
-  gap: 7px;
+  gap: 3px;
+  min-height: 0;
+  padding: 0 0 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: rgba(197, 209, 228, 0.35) transparent;
+  scrollbar-width: thin;
 }
 
 
 .sidebar-link {
   display: flex;
   align-items: center;
-
-  gap: 14px;
-
+  flex: 0 0 auto;
+  gap: 10px;
   width: 100%;
-  padding: 13px 15px;
-
-  border: none;
-  border-radius: 10px;
-
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
   background: transparent;
   color: #c5d1e4;
-
+  font: inherit;
+  font-size: 11px;
+  font-weight: 400;
   text-decoration: none;
   text-align: left;
-
   cursor: pointer;
-
-  font-size: 14px;
-  font-family: inherit;
-
-  transition: 0.2s;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-
-.sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-
-  color: white;
+.sidebar-link svg {
+  flex: 0 0 auto;
 }
 
-
+.sidebar-link:hover,
 .sidebar-link.active {
-  background: #1675f5;
+  background: var(--student-blue);
+  color: #fff;
+}
 
-  color: white;
+.sidebar-link:focus-visible,
+.sidebar-brand:focus-visible,
+.student-menu-button:focus-visible {
+  outline: 2px solid #91bdff;
+  outline-offset: 2px;
 }
 
 .sidebar-link.static-link {
@@ -146,20 +153,11 @@
   justify-content: flex-start;
 }
 
-.logout-message {
-  margin: 12px 0 0;
-  color: #fef3c7;
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-
 .sidebar-bottom {
+  flex: 0 0 auto;
   margin-top: auto;
-
-  border-top: 1px solid rgba(255,255,255,0.15);
-
-  padding-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 
@@ -168,9 +166,13 @@
 ========================= */
 
 .dashboard-main {
-  flex: 1;
-
+  flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 
@@ -179,37 +181,39 @@
 ========================= */
 
 .dashboard-topbar {
-  height: 72px;
-
-  background: white;
-
-  border-bottom: 1px solid #e5eaf1;
-
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
-  padding: 0 32px;
+  height: 64px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--student-border);
+  background: #fff;
 }
 
 
 .topbar-right {
   display: flex;
   align-items: center;
-
-  gap: 25px;
+  gap: 19px;
 }
 
-.mobile-logout-button {
+.student-menu-button {
   display: none;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 9px;
-  border: 1px solid #d7e0ed;
-  border-radius: 8px;
-  background: white;
-  color: #31506f;
-  font-size: 13px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--student-border);
+  border-radius: 6px;
+  background: #fff;
+  color: #344862;
+  cursor: pointer;
+}
+
+.student-nav-backdrop {
+  display: none;
 }
 
 
@@ -310,11 +314,10 @@
 ========================= */
 
 .dashboard-content {
-  padding: 30px;
-
+  width: 100%;
   max-width: 1600px;
-
-  margin: auto;
+  margin: 0 auto;
+  padding: 25px 28px 38px;
 }
 
 
@@ -1000,6 +1003,7 @@
 @media (max-width: 900px) {
 
   .dashboard-sidebar {
+    flex-basis: 220px;
     width: 220px;
   }
 
@@ -1009,23 +1013,56 @@
 
 }
 
-
-@media (max-width: 700px) {
-
+@media (max-width: 760px) {
   .dashboard-sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(285px, 84vw);
+    height: 100vh;
+    height: 100dvh;
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+  }
+
+  .dashboard-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .student-nav-backdrop {
+    position: fixed;
+    z-index: 25;
+    inset: 0;
+    display: block;
+    border: 0;
+    background: rgba(9, 25, 49, 0.45);
   }
 
   .dashboard-topbar {
+    justify-content: initial;
+    height: 60px;
     padding: 0 15px;
   }
 
-  .student-info {
-    display: none;
+  .topbar-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 11px;
   }
 
-  .mobile-logout-button {
-    display: inline-flex;
+  .student-menu-button {
+    display: grid;
+  }
+
+  .dashboard-content {
+    padding: 20px 15px 30px;
+  }
+}
+
+@media (max-width: 700px) {
+  .student-info {
+    display: none;
   }
 
   .dashboard-content {
