@@ -1,53 +1,90 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-const MOCK_SESSION_KEY = "uems.mockSession";
-const roles = ["student", "organizer", "admin"];
+const TOKEN_KEY = "uems.authToken";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const AuthContext = createContext(null);
 
-function readMockSession() {
-  const storedSession = window.localStorage.getItem(MOCK_SESSION_KEY);
-  if (!storedSession) return null;
-
-  let session;
-  try {
-    session = JSON.parse(storedSession);
-  } catch {
-    window.localStorage.removeItem(MOCK_SESSION_KEY);
-    return null;
-  }
-
-  if (!session || !roles.includes(session.role) || typeof session.email !== "string") {
-    window.localStorage.removeItem(MOCK_SESSION_KEY);
-    return null;
-  }
-
-  return session;
+function getStoredToken() {
+  return window.localStorage.getItem(TOKEN_KEY) || window.sessionStorage.getItem(TOKEN_KEY);
 }
 
-function roleFromEmail(email) {
-  const username = email.trim().split("@")[0]?.toLowerCase();
-  if (username === "admin") return "admin";
-  if (username === "organizer") return "organizer";
-  return "student";
+function clearStoredToken() {
+  window.localStorage.removeItem(TOKEN_KEY);
+  window.sessionStorage.removeItem(TOKEN_KEY);
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(readMockSession);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(() => Boolean(getStoredToken()));
 
-  const login = (email) => {
-    // Replace this local-only role mapping with POST /api/auth/login when the backend exists.
-    const session = { email: email.trim(), role: roleFromEmail(email) };
-    window.localStorage.setItem(MOCK_SESSION_KEY, JSON.stringify(session));
-    setUser(session);
-    return session.role;
+  useEffect(() => {
+    let isMounted = true;
+    const token = getStoredToken();
+    window.localStorage.removeItem("uems.mockSession");
+
+    if (!token) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    fetch(`${API_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "Unable to verify the saved session.");
+        }
+        if (isMounted) setUser(result.user);
+      })
+      .catch(() => {
+        clearStoredToken();
+        if (isMounted) setUser(null);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = async (email, password, rememberMe) => {
+    let response;
+    try {
+      response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+    } catch {
+      throw new Error("Unable to reach the authentication server. Check that the backend is running.");
+    }
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Unable to sign in.");
+    }
+
+    clearStoredToken();
+    const storage = rememberMe ? window.localStorage : window.sessionStorage;
+    storage.setItem(TOKEN_KEY, result.token);
+    setUser(result.user);
+    return result.user;
   };
 
   const logout = () => {
-    window.localStorage.removeItem(MOCK_SESSION_KEY);
+    clearStoredToken();
     setUser(null);
   };
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

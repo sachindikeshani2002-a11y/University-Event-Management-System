@@ -8,8 +8,9 @@ const dashboardByRole = {
 };
 
 export function RequireRole({ role }) {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
+  if (isLoading) return <div role="status">Checking your session...</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== role) return <Navigate to={dashboardByRole[user.role]} replace />;
 
@@ -17,7 +18,8 @@ export function RequireRole({ role }) {
 }
 
 export function RequireGuest({ children }) {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <div role="status">Checking your session...</div>;
   if (user) return <Navigate to={dashboardByRole[user.role]} replace />;
   return children;
 }

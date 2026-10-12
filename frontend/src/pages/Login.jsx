@@ -20,28 +20,36 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!email.trim()) {
       setValidationMessage("Please enter your email.");
       return;
     }
-    if (!password.trim()) {
+    if (!password) {
       setValidationMessage("Please enter your password.");
       return;
     }
 
-    const mockRole = login(email);
     setValidationMessage("");
+    setIsSubmitting(true);
 
-    const routeMap = {
-      student: "/",
-      organizer: "/organizer",
-      admin: "/admin",
-    };
-    navigate(routeMap[mockRole], { replace: true });
+    try {
+      const authenticatedUser = await login(email.trim(), password, rememberMe);
+      const routeMap = {
+        student: "/",
+        organizer: "/organizer",
+        admin: "/admin",
+      };
+      navigate(routeMap[authenticatedUser.role], { replace: true });
+    } catch (error) {
+      setValidationMessage(error.message || "Unable to sign in. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -159,8 +167,8 @@ function Login() {
             </button>
           </div>
 
-          <button type="submit" className="login-btn">
-            Login →
+          <button type="submit" className="login-btn" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Login →"}
           </button>
 
           <div className="or">OR</div>
@@ -176,11 +184,6 @@ function Login() {
             </button>
           </p>
 
-          <p className="mock-login-hint">
-            Temporary mock login: <strong>admin@mock.test</strong> opens Admin,
-            <strong> organizer@mock.test</strong> opens Organizer, and any other email opens Student.
-            Any non-empty password works.
-          </p>
         </form>
       </div>
     </div>
