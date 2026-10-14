@@ -11,11 +11,13 @@ function formatDate(value) {
 }
 
 function OrganizerAnnouncements() {
-  const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useOrganizer();
+  const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement, error: loadError } = useOrganizer();
   const [formOpen, setFormOpen] = useState(false);
   const [formData, setFormData] = useState(emptyAnnouncement);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const isEditing = Boolean(formData.id);
 
   const openCreate = () => { setFormData({ ...emptyAnnouncement }); setFormOpen(true); };
@@ -23,22 +25,31 @@ function OrganizerAnnouncements() {
   const closeForm = () => { setFormOpen(false); setFormData(emptyAnnouncement); };
   const updateField = (event) => setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
 
-  const saveAnnouncement = (event) => {
+  const saveAnnouncement = async (event) => {
     event.preventDefault();
-    if (isEditing) {
-      updateAnnouncement(formData.id, formData);
-      setNotice("Announcement updated.");
-    } else {
-      addAnnouncement(formData);
-      setNotice("Announcement created.");
-    }
-    closeForm();
+    setSaving(true); setError(""); setNotice("");
+    try {
+      if (isEditing) {
+        await updateAnnouncement(formData.id, formData);
+        setNotice("Announcement updated.");
+      } else {
+        await addAnnouncement(formData);
+        setNotice("Announcement created.");
+      }
+      closeForm();
+    } catch (failure) {
+      setError(failure.message || "Unable to save announcement.");
+    } finally { setSaving(false); }
   };
 
-  const confirmDelete = () => {
-    deleteAnnouncement(deleteTarget.id);
-    setNotice("Announcement deleted.");
-    setDeleteTarget(null);
+  const confirmDelete = async () => {
+    try {
+      await deleteAnnouncement(deleteTarget.id);
+      setNotice("Announcement deleted.");
+      setDeleteTarget(null);
+    } catch (failure) {
+      setError(failure.message || "Unable to delete announcement.");
+    }
   };
 
   return (
@@ -46,6 +57,8 @@ function OrganizerAnnouncements() {
       <div className="organizer-page">
         <header className="organizer-page-header"><div><span className="organizer-eyebrow">CAMPUS COMMUNICATION</span><h1>Announcements</h1><p>Share timely updates with your university community.</p></div><button className="organizer-button" type="button" onClick={openCreate}><Plus size={16} />New Announcement</button></header>
         {notice && <div className="organizer-feedback" role="status">{notice}<button type="button" className="organizer-notice-dismiss" aria-label="Dismiss message" onClick={() => setNotice("")}>×</button></div>}
+        {error && <div className="organizer-feedback" role="alert">{error}</div>}
+        {loadError && <div className="organizer-feedback" role="alert">{loadError}</div>}
         <section className="organizer-announcement-list" aria-label="Announcements">
           {announcements.map((announcement) => <article className="organizer-card organizer-announcement-card" key={announcement.id}>
             <span className="organizer-announcement-icon"><Megaphone size={18} /></span>
@@ -62,7 +75,7 @@ function OrganizerAnnouncements() {
           <div className="organizer-form-field"><label htmlFor="announcement-title">Title <span>*</span></label><input className="organizer-input" id="announcement-title" name="title" value={formData.title} onChange={updateField} required maxLength={120} /></div>
           <div className="organizer-form-field"><label htmlFor="announcement-message">Message <span>*</span></label><textarea className="organizer-textarea" id="announcement-message" name="message" value={formData.message} onChange={updateField} required maxLength={1000} /></div>
           <div className="organizer-announcement-form-row"><div className="organizer-form-field"><label htmlFor="announcement-date">Date</label><input className="organizer-input" id="announcement-date" name="date" type="date" value={formData.date} onChange={updateField} required /></div><div className="organizer-form-field"><label htmlFor="announcement-status">Status</label><select className="organizer-input" id="announcement-status" name="status" value={formData.status} onChange={updateField}><option>Draft</option><option>Published</option></select></div></div>
-          <div className="organizer-modal-actions"><button className="organizer-button secondary" type="button" onClick={closeForm}>Cancel</button><button className="organizer-button" type="submit">{isEditing ? "Save Changes" : "Create Announcement"}</button></div>
+          <div className="organizer-modal-actions"><button className="organizer-button secondary" type="button" onClick={closeForm}>Cancel</button><button className="organizer-button" type="submit" disabled={saving}>{saving ? "Saving..." : isEditing ? "Save Changes" : "Create Announcement"}</button></div>
         </form>
       </section></div>}
 

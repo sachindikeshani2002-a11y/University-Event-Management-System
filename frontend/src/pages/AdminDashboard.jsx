@@ -11,26 +11,29 @@ function formatDate(value) {
 }
 
 function AdminDashboard() {
-  const { users, students, organizers, events, registrations, approveEvent, rejectEvent } = useAdmin();
+  const { events, registrations, dashboardStats, isLoading, error, approveEvent, rejectEvent } = useAdmin();
   const [notice, setNotice] = useState("");
   const [rejectTarget, setRejectTarget] = useState(null);
   const pending = events.filter((event) => event.status === "Pending");
   const stats = [
-    { label: "Total Users", value: users.length, icon: UsersRound, tone: "blue" },
-    { label: "Total Students", value: students.length, icon: GraduationCap, tone: "green" },
-    { label: "Total Organizers", value: organizers.length, icon: BriefcaseBusiness, tone: "blue" },
-    { label: "Total Events", value: events.length, icon: CalendarDays, tone: "green" },
+    { label: "Total Users", value: dashboardStats?.userCount || 0, icon: UsersRound, tone: "blue" },
+    { label: "Total Students", value: dashboardStats?.usersByRole?.find((item) => item._id === "student")?.count || 0, icon: GraduationCap, tone: "green" },
+    { label: "Total Organizers", value: dashboardStats?.usersByRole?.find((item) => item._id === "organizer")?.count || 0, icon: BriefcaseBusiness, tone: "blue" },
+    { label: "Total Events", value: dashboardStats?.totalEvents || 0, icon: CalendarDays, tone: "green" },
     { label: "Pending Event Approvals", value: pending.length, icon: BadgeCheck, tone: "amber" },
-    { label: "Total Registrations", value: registrations.length, icon: ClipboardList, tone: "blue" },
+    { label: "Total Registrations", value: dashboardStats?.registrations || 0, icon: ClipboardList, tone: "blue" },
   ];
-  const rejectEventFromDashboard = (eventId) => {
-    rejectEvent(eventId, "Please review the event submission details and resubmit.");
-    setNotice("Event rejected and activity recorded.");
+  const rejectEventFromDashboard = async (eventId) => {
+    try {
+      await rejectEvent(eventId, "Please review the event submission details and resubmit.");
+      setNotice("Event rejected.");
+    } catch (error) {
+      setNotice(error.message || "Unable to reject this event.");
+    }
     setRejectTarget(null);
   };
   const approveEventFromDashboard = (event) => {
-    approveEvent(event.id);
-    setNotice(`${event.title} approved and published.`);
+    approveEvent(event.id).then(() => setNotice(`${event.title} approved and published.`)).catch((error) => setNotice(error.message || "Unable to approve event."));
   };
 
   return (
@@ -38,6 +41,8 @@ function AdminDashboard() {
       <div className="admin-page">
         <AdminPageHeader eyebrow="SYSTEM OVERVIEW" title="Admin Dashboard" description="Monitor and manage the university event management system." />
         {notice && <div className="admin-feedback" role="status">{notice}<button className="admin-feedback-dismiss" type="button" aria-label="Dismiss message" onClick={() => setNotice("")}>×</button></div>}
+        {error && <p role="alert">{error}</p>}
+        {isLoading && <p role="status">Loading system data...</p>}
         <section className="admin-stat-grid" aria-label="System statistics">
           {stats.map(({ label, value, icon: Icon, tone }) => <article className="admin-card admin-stat-card" key={label}><span className={`admin-stat-icon ${tone}`}><Icon size={17} aria-hidden="true" /></span><div className="admin-stat-copy"><span>{label}</span><strong>{value.toLocaleString()}</strong></div></article>)}
         </section>

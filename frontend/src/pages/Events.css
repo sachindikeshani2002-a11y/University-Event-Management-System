@@ -5,6 +5,24 @@
   color: #17233c;
 }
 
+.events-page .no-events {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 120px;
+  padding: 28px 20px;
+  border: 1px solid #e5eaf1;
+  border-radius: 12px;
+  background: #fff;
+  color: #718097;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
 /* Header */
 
 .events-header {

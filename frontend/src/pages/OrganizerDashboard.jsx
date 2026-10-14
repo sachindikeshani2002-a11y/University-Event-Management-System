@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import OrganizerLayout from "../components/OrganizerLayout";
 import { useOrganizer } from "../context/OrganizerContext";
+import { useAuth } from "../context/AuthContext";
 import "./OrganizerDashboard.css";
 
 const statisticIcons = [CalendarDays, CircleCheck, UsersRound, CalendarClock];
@@ -24,7 +25,8 @@ function formatEventDate(value) {
 }
 
 function OrganizerDashboard() {
-  const { organizerEvents } = useOrganizer();
+  const { user } = useAuth();
+  const { organizerEvents, isLoadingEvents, error } = useOrganizer();
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = organizerEvents
     .filter((event) => event.date >= today && event.status === "Published")
@@ -42,13 +44,15 @@ function OrganizerDashboard() {
         <section className="organizer-welcome">
           <div>
             <span className="organizer-eyebrow">ORGANIZER WORKSPACE</span>
-            <h1>Welcome back, Alex!</h1>
+            <h1>Welcome back, {user?.name || "Organizer"}!</h1>
             <p>Manage your events, registrations, and university activities from one place.</p>
           </div>
           <Link className="organizer-button" to="/organizer/events/create">
             <Plus size={16} aria-hidden="true" /> Create Event
           </Link>
         </section>
+
+        {error && <p role="alert">{error}</p>}
 
         <section className="organizer-stat-grid" aria-label="Event statistics">
           {stats.map((stat, index) => {
@@ -73,7 +77,7 @@ function OrganizerDashboard() {
             </div>
             <Link className="organizer-text-link" to="/organizer/events">All events <ArrowUpRight size={14} /></Link>
           </div>
-          <div className="organizer-table-wrap">
+          {isLoadingEvents ? <p role="status">Loading your events...</p> : <div className="organizer-table-wrap">
             <table className="organizer-table">
               <thead>
                 <tr><th>Event</th><th>Date &amp; time</th><th>Registrations</th><th>Status</th><th>Actions</th></tr>
@@ -96,7 +100,7 @@ function OrganizerDashboard() {
                 {!upcoming.length && <tr><td colSpan="5"><div className="organizer-empty-state">No upcoming published events.</div></td></tr>}
               </tbody>
             </table>
-          </div>
+          </div>}
         </section>
       </div>
     </OrganizerLayout>

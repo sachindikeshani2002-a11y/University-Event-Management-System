@@ -92,6 +92,24 @@
   font-size: 14px;
 }
 
+.profile-row input {
+  width: 100%;
+  border: 1px solid #d8e0eb;
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: #17233c;
+  background: #fff;
+}
+
+.profile-card form > .primary-action-button {
+  margin-top: 20px;
+}
+
+.profile-card button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
 @media (max-width: 700px) {
   .page-shell {
     padding: 18px;

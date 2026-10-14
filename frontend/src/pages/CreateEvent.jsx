@@ -21,7 +21,7 @@ const blankForm = {
 function CreateEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { organizerEvents, addEvent, updateEvent } = useOrganizer();
+  const { organizerEvents, addEvent, updateEvent, isLoadingEvents } = useOrganizer();
   const editingEvent = id ? organizerEvents.find((event) => String(event.id) === id) : null;
   const [formData, setFormData] = useState(() => editingEvent ? {
     ...blankForm,
@@ -29,8 +29,11 @@ function CreateEvent() {
     maxParticipants: editingEvent.maxParticipants ? String(editingEvent.maxParticipants) : "",
   } : blankForm);
   const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const isEditing = Boolean(id);
 
+  if (isEditing && isLoadingEvents) return <OrganizerLayout><div className="organizer-page" role="status">Loading event...</div></OrganizerLayout>;
   if (isEditing && !editingEvent) return <Navigate to="/organizer/events" replace />;
 
   const updateField = (event) => {
@@ -38,10 +41,10 @@ function CreateEvent() {
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const requestedStatus = event.nativeEvent.submitter?.value;
-    const status = isEditing ? (requestedStatus || formData.status) : (requestedStatus || "Published");
+    const status = requestedStatus || formData.status || "Pending";
     const formattedTime = `${new Date(`1970-01-01T${formData.startTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} - ${new Date(`1970-01-01T${formData.endTime}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
     const values = {
       ...formData,
@@ -51,13 +54,21 @@ function CreateEvent() {
       status,
     };
 
-    if (isEditing) {
-      updateEvent(id, values);
-      setFeedback("Event changes saved.");
-    } else {
-      addEvent(values);
-      setFeedback(status === "Draft" ? "Event saved as a draft." : "Event published successfully.");
-      setFormData(blankForm);
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      if (isEditing) {
+        await updateEvent(id, values);
+        setFeedback("Event changes saved and submitted for approval.");
+      } else {
+        await addEvent(values);
+        setFeedback(status === "Draft" ? "Event saved as a draft." : "Event submitted for approval.");
+        setFormData(blankForm);
+      }
+    } catch (error) {
+      setErrorMessage(error.message || "Unable to save the event.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -69,6 +80,7 @@ function CreateEvent() {
         </header>
 
         {feedback && <div className="organizer-feedback" role="status">{feedback}{!isEditing && <Link className="organizer-feedback-link" to="/organizer/events">View My Events</Link>}</div>}
+        {errorMessage && <div className="organizer-feedback" role="alert">{errorMessage}</div>}
 
         <section className="organizer-card organizer-form-card">
           <form onSubmit={handleSubmit}>
@@ -82,12 +94,12 @@ function CreateEvent() {
               <div className="organizer-form-field full-width"><label htmlFor="event-location">Location <span>*</span></label><input className="organizer-input" id="event-location" name="location" value={formData.location} onChange={updateField} required maxLength={140} placeholder="Building, room, or online venue" /></div>
               <div className="organizer-form-field"><label htmlFor="event-capacity">Maximum participants</label><input className="organizer-input" id="event-capacity" name="maxParticipants" type="number" min="1" value={formData.maxParticipants} onChange={updateField} placeholder="e.g. 150" /></div>
               <div className="organizer-form-field"><label htmlFor="event-deadline">Registration deadline</label><input className="organizer-input" id="event-deadline" name="registrationDeadline" type="date" value={formData.registrationDeadline} onChange={updateField} /></div>
-              <div className="organizer-form-field"><label htmlFor="event-status">Event status</label><select className="organizer-input" id="event-status" name="status" value={formData.status} onChange={updateField}><option>Draft</option><option>Published</option>{isEditing && <option>Completed</option>}</select></div>
+              <div className="organizer-form-field"><label htmlFor="event-status">Submission status</label><select className="organizer-input" id="event-status" name="status" value={formData.status === "Draft" ? "Draft" : "Pending"} onChange={updateField}><option value="Draft">Draft</option><option value="Pending">Submit for approval</option></select></div>
             </div>
             <div className="organizer-form-actions">
               <button className="organizer-button secondary" type="button" onClick={() => navigate("/organizer/events")}>Cancel</button>
-              {!isEditing && <button className="organizer-button secondary" type="submit" value="Draft"><Check size={15} />Save as Draft</button>}
-              <button className="organizer-button" type="submit" value={isEditing ? formData.status : "Published"}><Send size={15} />{isEditing ? "Save Changes" : "Publish Event"}</button>
+              {!isEditing && <button className="organizer-button secondary" type="submit" value="Draft" disabled={isSubmitting}><Check size={15} />Save as Draft</button>}
+              <button className="organizer-button" type="submit" value={isEditing ? (formData.status === "Draft" ? "Draft" : "Pending") : "Pending"} disabled={isSubmitting}><Send size={15} />{isSubmitting ? "Saving..." : isEditing ? "Save Changes" : "Submit for Approval"}</button>
             </div>
           </form>
         </section>

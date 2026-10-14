@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const TOKEN_KEY = "uems.authToken";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -75,13 +75,51 @@ export function AuthProvider({ children }) {
     return result.user;
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearStoredToken();
     setUser(null);
-  };
+  }, []);
+
+  const request = useCallback(async (path, options = {}) => {
+    const token = getStoredToken();
+    const headers = new Headers(options.headers || {});
+    if (options.body != null && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    let response;
+    try {
+      response = await fetch(`${API_URL}${path}`, { ...options, headers });
+    } catch {
+      throw new Error("Unable to reach the server. Check that the backend is running.");
+    }
+    let result = {};
+    try {
+      result = response.status === 204 ? {} : await response.json();
+    } catch {
+      // Use a safe generic message if the server did not return JSON.
+    }
+    if (response.status === 401 && token) logout();
+    if (!response.ok) {
+      const message = response.status >= 500
+        ? "The request could not be completed. Please try again later."
+        : result.message || "The request could not be completed.";
+      throw new Error(message);
+    }
+    return result;
+  }, [logout]);
+
+  const updateProfile = useCallback(async (updates) => {
+    const result = await request("/api/auth/me", { method: "PATCH", body: JSON.stringify(updates) });
+    setUser(result.user);
+    return result.user;
+  }, [request]);
+
+  const register = useCallback(async ({ name, email, password }) => request("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), password }),
+  }), [request]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, request, updateProfile, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

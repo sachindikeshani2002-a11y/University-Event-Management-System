@@ -6,7 +6,7 @@ import { useOrganizer } from "../context/OrganizerContext";
 import "./OrganizerRegistrations.css";
 
 function formatDate(value) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 function OrganizerRegistrations() {

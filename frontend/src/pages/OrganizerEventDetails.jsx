@@ -10,8 +10,10 @@ function formatEventDate(value) {
 
 function OrganizerEventDetails() {
   const { id } = useParams();
-  const { organizerEvents } = useOrganizer();
+  const { organizerEvents, isLoadingEvents, error } = useOrganizer();
   const event = organizerEvents.find((item) => String(item.id) === id);
+  if (isLoadingEvents) return <OrganizerLayout><div className="organizer-page" role="status">Loading event...</div></OrganizerLayout>;
+  if (error) return <OrganizerLayout><div className="organizer-page" role="alert">{error}</div></OrganizerLayout>;
   if (!event) return <Navigate to="/organizer/events" replace />;
 
   return (

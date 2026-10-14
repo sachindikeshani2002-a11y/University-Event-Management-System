@@ -36,13 +36,16 @@
 
 .empty-state-card h2 {
   margin: 0 0 10px;
-  font-size: 24px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
   color: #18243b;
 }
 
 .empty-state-card p {
   margin: 0 0 18px;
   color: #77859a;
+  font-size: 14px;
   line-height: 1.6;
 }
 

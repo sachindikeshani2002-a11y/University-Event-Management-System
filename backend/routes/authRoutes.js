@@ -15,6 +15,10 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Name, email, and password are required." });
   }
 
+  if (name.length > 120 || email.length > 254) {
+    return res.status(400).json({ message: "Name or email address is too long." });
+  }
+
   if (!emailPattern.test(email)) {
     return res.status(400).json({ message: "Please provide a valid email address." });
   }
@@ -70,6 +74,25 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", authenticateToken, (req, res) => {
   return res.json({ user: req.user });
+});
+
+router.patch("/me", authenticateToken, async (req, res) => {
+  const updates = {};
+  if (typeof req.body?.name === "string") updates.name = req.body.name.trim();
+  if (typeof req.body?.email === "string") updates.email = req.body.email.trim().toLowerCase();
+  if (Object.keys(updates).length === 0 || Object.values(updates).some((value) => !value)) {
+    return res.status(400).json({ message: "Provide a valid name or email to update." });
+  }
+  if ((updates.name && updates.name.length > 120) || (updates.email && updates.email.length > 254)) return res.status(400).json({ message: "Name or email address is too long." });
+  if (updates.email && !emailPattern.test(updates.email)) return res.status(400).json({ message: "Please provide a valid email address." });
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true, runValidators: true });
+    if (!user) return res.status(404).json({ message: "Account not found." });
+    return res.json({ user: user.toJSON() });
+  } catch (error) {
+    if (error.code === 11000) return res.status(409).json({ message: "An account with this email already exists." });
+    throw error;
+  }
 });
 
 module.exports = router;

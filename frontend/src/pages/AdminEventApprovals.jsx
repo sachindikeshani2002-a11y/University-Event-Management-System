@@ -6,22 +6,24 @@ import { AdminModal, AdminPageHeader, AdminStatus } from "../components/AdminUi"
 import { useAdmin } from "../context/AdminContext";
 import "./AdminEventApprovals.css";
 
-function formatDate(value) { return new Date(`${value}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+function formatDate(value) { return new Date(`${String(value).slice(0, 10)}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
 
 function AdminEventApprovals() {
-  const { events, approveEvent, rejectEvent } = useAdmin();
+  const { events, approveEvent, rejectEvent, isLoading, error } = useAdmin();
   const [search, setSearch] = useState("");
   const [reviewing, setReviewing] = useState(null);
   const [rejecting, setRejecting] = useState(null);
   const [reason, setReason] = useState("");
   const [notice, setNotice] = useState("");
   const pending = useMemo(() => events.filter((event) => event.status === "Pending" && (!search.trim() || `${event.title} ${event.organizer} ${event.category}`.toLowerCase().includes(search.trim().toLowerCase()))), [events, search]);
-  const confirmReject = (event) => { rejectEvent(event.id, reason.trim()); setNotice(`${event.title} rejected.`); setRejecting(null); setReason(""); };
-  const confirmApprove = (event) => { approveEvent(event.id); setNotice(`${event.title} approved and published.`); setReviewing(null); };
+  const confirmReject = async (event) => { try { await rejectEvent(event.id, reason.trim()); setNotice(`${event.title} rejected.`); } catch (failure) { setNotice(failure.message || "Unable to reject this event."); } setRejecting(null); setReason(""); };
+  const confirmApprove = async (event) => { try { await approveEvent(event.id); setNotice(`${event.title} approved and published.`); } catch (failure) { setNotice(failure.message || "Unable to approve this event."); } setReviewing(null); };
 
   return <AdminLayout><div className="admin-page">
     <AdminPageHeader eyebrow="REVIEW QUEUE" title="Event Approvals" description="Review organizer submissions before they are published." />
     {notice && <div className="admin-feedback" role="status">{notice}<button className="admin-feedback-dismiss" type="button" aria-label="Dismiss" onClick={() => setNotice("")}>×</button></div>}
+    {error && <p role="alert">{error}</p>}
+    {isLoading && <p role="status">Updating event list...</p>}
     <div className="admin-toolbar"><label className="admin-search"><Search size={15} /><input aria-label="Search pending approvals" type="search" placeholder="Search event or organizer" value={search} onChange={(event) => setSearch(event.target.value)} /></label><span className="admin-approval-count">{pending.length} pending review</span></div>
     <section className="admin-card admin-section"><div className="admin-table-wrap"><table className="admin-table admin-approvals-table"><thead><tr><th>Event</th><th>Organizer</th><th>Date &amp; location</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead><tbody>
       {pending.map((event) => <tr key={event.id}><td><strong>{event.title}</strong><span className="admin-table-subtext">{event.category}</span></td><td>{event.organizer}</td><td>{formatDate(event.date)}<span className="admin-table-subtext">{event.location}</span></td><td>{formatDate(event.submittedDate)}</td><td><AdminStatus status={event.status} /></td><td><span className="admin-row-actions"><button className="admin-icon-button" type="button" aria-label={`Review ${event.title}`} title="Review" onClick={() => setReviewing(event)}><Eye size={15} /></button><button className="admin-icon-button approve" type="button" aria-label={`Approve ${event.title}`} title="Approve" onClick={() => confirmApprove(event)}><Check size={15} /></button><button className="admin-icon-button danger" type="button" aria-label={`Reject ${event.title}`} title="Reject" onClick={() => { setRejecting(event); setReason(""); }}><X size={15} /></button></span></td></tr>)}

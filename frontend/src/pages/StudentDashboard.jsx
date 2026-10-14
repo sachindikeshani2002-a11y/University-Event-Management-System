@@ -1,29 +1,55 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import events from "../data/events";
+import { useAuth } from "../context/AuthContext";
 import {
   CalendarDays,
   ClipboardList,
   Bookmark,
-  Bell,
   MapPin,
   Clock,
   Users,
   ChevronRight,
+  Bell,
 } from "lucide-react";
 import StudentLayout from "../components/StudentLayout";
+import EmptyState from "../components/EmptyState";
 import { useStudent } from "../context/StudentContext";
 import "./StudentDashboard.css";
 
-const CALENDAR_YEAR = 2026;
-const CALENDAR_MONTH = 9;
+const CALENDAR_YEAR = new Date().getFullYear();
+const CALENDAR_MONTH = new Date().getMonth();
 
 function StudentDashboard() {
+  const { user, request } = useAuth();
   const { savedEvents, registeredEvents } = useStudent();
-
+  const [events, setEvents] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const upcomingEvents = events.slice(0, 3);
-  const totalEvents = events.length;
-  const upcomingEventCount = upcomingEvents.length;
+  const upcomingEventCount = totalEvents;
+
+  useEffect(() => {
+    let active = true;
+    request("/api/dashboard/student").then((result) => {
+      if (!active) return;
+      const formatTime = (value) => value ? new Date(`1970-01-01T${value}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
+      const mapEvent = (item) => ({
+        ...item,
+        id: item._id || item.id,
+        date: new Date(`${String(item.date).slice(0, 10)}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" }),
+        time: `${formatTime(item.startTime)} - ${formatTime(item.endTime)}`,
+        participants: item.capacity ? `${item.registrationCount || 0} / ${item.capacity} Participants` : `${item.registrationCount || 0} Participants`,
+      });
+      setEvents((result.upcomingEvents || []).map(mapEvent));
+      setAnnouncements(result.announcements || []);
+      setTotalEvents(result.availableEventCount || 0);
+    }).catch((error) => {
+      if (active) setLoadError(error.message || "Unable to load your dashboard.");
+    }).finally(() => { if (active) setIsLoading(false); });
+    return () => { active = false; };
+  }, [request]);
 
   const eventDateMap = useMemo(() => {
     const dateMap = new Map();
@@ -34,7 +60,7 @@ function StudentDashboard() {
     });
 
     return dateMap;
-  }, []);
+  }, [events]);
 
   const getDateKey = (date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate()).toDateString();
@@ -66,8 +92,8 @@ function StudentDashboard() {
       .map((event) => new Date(event.date))
       .sort((a, b) => a - b);
 
-    return sortedDates[0];
-  }, []);
+    return sortedDates[0] || new Date(CALENDAR_YEAR, CALENDAR_MONTH, new Date().getDate());
+  }, [events]);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -87,7 +113,7 @@ function StudentDashboard() {
         const eventDate = new Date(event.date);
         return getDateKey(eventDate) === selectedDateKey;
       }),
-    [selectedDateKey]
+    [events, selectedDateKey]
   );
 
   const today = new Date();
@@ -98,7 +124,7 @@ function StudentDashboard() {
     <StudentLayout>
       <div className="dashboard-content">
         <section className="welcome-area">
-          <h1>Welcome back, Asha! 👋</h1>
+          <h1>Welcome back, {user?.name || "Student"}!</h1>
 
           <p>
             Discover events, connect with others, and make the most of your
@@ -170,7 +196,7 @@ function StudentDashboard() {
               </Link>
             </div>
 
-            {upcomingEvents.map((event) => (
+            {isLoading ? <p role="status">Loading events...</p> : loadError ? <p role="alert">{loadError}</p> : upcomingEvents.map((event) => (
               <div className="event-card" key={event.id}>
                 <div className="event-date">
                   <strong>{event.date.split(" ")[1].replace(",", "")}</strong>
@@ -212,11 +238,12 @@ function StudentDashboard() {
                   </div>
                 </div>
 
-                <Link to="/events" className="details-button">
+                <Link to={`/events?event=${event.id}`} className="details-button">
                   Details
                 </Link>
               </div>
             ))}
+            {!isLoading && !loadError && !upcomingEvents.length && <EmptyState title="No upcoming published events." compact />}
           </section>
 
 
@@ -240,7 +267,7 @@ function StudentDashboard() {
                 </h2>
 
                 <div>
-                  October 2026
+                  {new Date(CALENDAR_YEAR, CALENDAR_MONTH).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                 </div>
 
               </div>
@@ -332,78 +359,10 @@ function StudentDashboard() {
             </div>
 
 
-            {/* =========================
-                Announcements
-            ========================= */}
-
             <div className="announcements-card">
-
-              <div className="announcement-title">
-
-                <h2>
-                  Recent Announcements
-                </h2>
-
-                <button>
-                  View All
-                </button>
-
-              </div>
-
-
-              {/* Announcement 1 */}
-
-              <div className="announcement">
-
-                <div className="announcement-icon">
-                  <Bell size={16} />
-                </div>
-
-                <div>
-
-                  <strong>
-                    New events added
-                  </strong>
-
-                  <p>
-                    5 new university events are available.
-                  </p>
-
-                  <small>
-                    2 hours ago
-                  </small>
-
-                </div>
-
-              </div>
-
-
-              {/* Announcement 2 */}
-
-              <div className="announcement">
-
-                <div className="announcement-icon">
-                  <Bell size={16} />
-                </div>
-
-                <div>
-
-                  <strong>
-                    Registration reminder
-                  </strong>
-
-                  <p>
-                    Don't forget to register for upcoming events.
-                  </p>
-
-                  <small>
-                    Yesterday
-                  </small>
-
-                </div>
-
-              </div>
-
+              <div className="announcement-title"><h2>Announcements</h2><Link to="/notifications">View All</Link></div>
+              {announcements.map((announcement) => <div className="announcement" key={announcement._id}><div className="announcement-icon"><Bell size={16} /></div><div><strong>{announcement.title}</strong><p>{announcement.message}</p><small>{new Date(announcement.date).toLocaleDateString()}</small></div></div>)}
+              {!isLoading && !loadError && !announcements.length && <EmptyState title="No announcements are available." compact />}
             </div>
 
           </aside>

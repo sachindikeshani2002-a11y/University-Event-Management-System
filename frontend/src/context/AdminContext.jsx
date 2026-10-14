@@ -1,132 +1,160 @@
-import { createContext, useContext, useState } from "react";
-import initialAdminData from "../data/adminData";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 const AdminContext = createContext(null);
+const displayRole = (role) => ({ student: "Student", organizer: "Organizer", admin: "Administrator" })[role] || role;
+
+function normalizeEvent(event) {
+  return {
+    ...event,
+    id: event._id || event.id,
+    organizer: event.organizer?.name || "Organizer",
+    organizerId: event.organizer?._id || event.organizer,
+    date: String(event.date).slice(0, 10),
+    submittedDate: String(event.createdAt || event.date).slice(0, 10),
+    registrations: event.registrationCount || 0,
+    capacity: event.capacity || "—",
+  };
+}
+
+function normalizeUser(user) {
+  return { ...user, id: user._id || user.id, role: displayRole(user.role), registeredDate: user.createdAt };
+}
 
 export function AdminProvider({ children }) {
-  const [users, setUsers] = useState(initialAdminData.users);
-  const [students, setStudents] = useState(initialAdminData.students);
-  const [organizers, setOrganizers] = useState(initialAdminData.organizers);
-  const [events, setEvents] = useState(initialAdminData.events);
-  const [registrations] = useState(initialAdminData.registrations);
-  const [announcements, setAnnouncements] = useState(initialAdminData.announcements);
-  const [notifications, setNotifications] = useState(initialAdminData.notifications);
-  const [activityLogs, setActivityLogs] = useState(initialAdminData.activityLogs);
+  const { user, request } = useAuth();
+  const [users, setUsers] = useState([]);
+  const [userPage, setUserPage] = useState(1);
+  const [userTotal, setUserTotal] = useState(0);
+  const [events, setEvents] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [registrationPage, setRegistrationPage] = useState(1);
+  const [registrationTotal, setRegistrationTotal] = useState(0);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [announcements, setAnnouncements] = useState([]);
+  const [notifications] = useState([]);
+  const [activityLogs] = useState([]);
 
-  const addActivity = (action, user = "Admin User", role = "Administrator") => {
-    const now = new Date();
-    const log = {
-      id: Date.now() + Math.random(),
-      action,
-      user,
-      role,
-      date: now.toISOString().slice(0, 10),
-      time: now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
-    };
-    setActivityLogs((current) => [log, ...current]);
+  const refresh = useCallback(async () => {
+    if (user?.role !== "admin") {
+      setUsers([]); setEvents([]); setRegistrations([]); setDashboardStats(null); setAnnouncements([]);
+      setUserPage(1); setUserTotal(0); setRegistrationPage(1); setRegistrationTotal(0);
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    try {
+      const [userResult, eventResult, registrationResult, statsResult, announcementResult] = await Promise.all([
+        request("/api/admin/users?page=1&limit=100"),
+        request("/api/events/admin"),
+        request("/api/registrations/admin?page=1&limit=25"),
+        request("/api/dashboard/admin"),
+        request("/api/announcements"),
+      ]);
+      setUsers((userResult.users || []).map(normalizeUser));
+      setUserPage(1);
+      setUserTotal(userResult.total || 0);
+      setEvents((eventResult.events || []).map(normalizeEvent));
+      setRegistrations((registrationResult.registrations || []).map((item) => ({
+        id: item._id,
+        student: item.student?.name || "Student",
+        studentId: "",
+        event: item.event?.title || "Event unavailable",
+        eventId: item.event?._id,
+        organizer: item.event?.organizer?.name || "Organizer",
+        date: item.createdAt,
+        status: item.status,
+      })));
+      setRegistrationPage(1);
+      setRegistrationTotal(registrationResult.total || 0);
+      setDashboardStats(statsResult);
+      setAnnouncements((announcementResult.announcements || []).map((item) => ({ ...item, id: item._id || item.id, date: String(item.date).slice(0, 10) })));
+    } catch (loadError) {
+      setError(loadError.message || "Unable to load administration data.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [request, user]);
+
+  useEffect(() => { Promise.resolve().then(refresh); }, [refresh]);
+
+  const loadRegistrationPage = async (page) => {
+    setIsLoading(true); setError("");
+    try {
+      const result = await request(`/api/registrations/admin?page=${page}&limit=25`);
+      setRegistrations((result.registrations || []).map((item) => ({
+        id: item._id, student: item.student?.name || "Student", studentId: "",
+        event: item.event?.title || "Event unavailable", eventId: item.event?._id,
+        organizer: item.event?.organizer?.name || "Organizer", date: item.createdAt, status: item.status,
+      })));
+      setRegistrationPage(result.page);
+      setRegistrationTotal(result.total || 0);
+    } catch (failure) {
+      setError(failure.message || "Unable to load registrations.");
+    } finally { setIsLoading(false); }
   };
 
-  const addUser = (user) => {
-    const newUser = { ...user, id: Date.now(), registeredDate: user.registeredDate || new Date().toISOString().slice(0, 10) };
-    setUsers((current) => [newUser, ...current]);
-    addActivity(`Added ${newUser.role.toLowerCase()} account for ${newUser.name}`);
-    return newUser;
+  const loadUserPage = async (page) => {
+    setIsLoading(true); setError("");
+    try {
+      const result = await request(`/api/admin/users?page=${page}&limit=100`);
+      setUsers((result.users || []).map(normalizeUser));
+      setUserPage(result.page);
+      setUserTotal(result.total || 0);
+    } catch (failure) {
+      setError(failure.message || "Unable to load accounts.");
+    } finally { setIsLoading(false); }
   };
 
-  const updateUser = (userId, updates) => {
-    setUsers((current) => current.map((user) => String(user.id) === String(userId) ? { ...user, ...updates } : user));
-    setStudents((current) => current.map((student) => String(student.userId) === String(userId) ? { ...student, ...updates, name: updates.name ?? student.name, email: updates.email ?? student.email } : student));
-    setOrganizers((current) => current.map((organizer) => String(organizer.userId) === String(userId) ? { ...organizer, ...updates, name: updates.name ?? organizer.name, email: updates.email ?? organizer.email } : organizer));
-    addActivity(`Updated user account ${userId}`);
-  };
+  const students = users.filter((item) => item.role === "Student");
+  const organizers = users.filter((item) => item.role === "Organizer");
 
-  const deleteUser = (userId) => {
-    const deleted = users.find((user) => String(user.id) === String(userId));
-    setUsers((current) => current.filter((user) => String(user.id) !== String(userId)));
-    setStudents((current) => current.filter((student) => String(student.userId) !== String(userId)));
-    setOrganizers((current) => current.filter((organizer) => String(organizer.userId) !== String(userId)));
-    if (deleted) addActivity(`Deleted user account for ${deleted.name}`);
+  const updateUser = async (userId, updates) => {
+    const role = updates.role ? ({ Student: "student", Organizer: "organizer", Administrator: "admin" })[updates.role] || updates.role : undefined;
+    await request(`/api/admin/users/${userId}`, { method: "PATCH", body: JSON.stringify({ name: updates.name, email: updates.email, role }) });
+    await refresh();
   };
-
-  const updateStudent = (studentId, updates) => {
-    setStudents((current) => current.map((student) => String(student.id) === String(studentId) ? { ...student, ...updates } : student));
-    const student = students.find((item) => String(item.id) === String(studentId));
-    if (student?.userId) setUsers((current) => current.map((user) => String(user.id) === String(student.userId) ? { ...user, ...(updates.name ? { name: updates.name } : {}), ...(updates.email ? { email: updates.email } : {}), ...(updates.status ? { status: updates.status } : {}) } : user));
-    addActivity(`Updated student record ${student?.name || studentId}`);
+  const deleteUser = async () => { throw new Error("User deletion is not enabled because registration history must be preserved."); };
+  const updateStudent = async (studentId, updates) => updateUser(studentId, updates);
+  const updateOrganizer = async (organizerId, updates) => updateUser(organizerId, updates);
+  const moderateEvent = async (eventId, status, reason = "") => {
+    await request(`/api/events/${eventId}/moderation`, { method: "PATCH", body: JSON.stringify({ status, reason }) });
+    await refresh();
   };
-
-  const updateOrganizer = (organizerId, updates) => {
-    setOrganizers((current) => current.map((organizer) => String(organizer.id) === String(organizerId) ? { ...organizer, ...updates } : organizer));
-    const organizer = organizers.find((item) => String(item.id) === String(organizerId));
-    if (organizer?.userId) setUsers((current) => current.map((user) => String(user.id) === String(organizer.userId) ? { ...user, ...(updates.name ? { name: updates.name } : {}), ...(updates.email ? { email: updates.email } : {}), ...(updates.status ? { status: updates.status } : {}) } : user));
-    addActivity(`Updated organizer record ${organizer?.name || organizerId}`);
+  const updateEvent = async (eventId, updates) => moderateEvent(eventId, updates.status);
+  const deleteEvent = async (eventId) => moderateEvent(eventId, "Cancelled");
+  const approveEvent = async (eventId) => moderateEvent(eventId, "Published");
+  const rejectEvent = async (eventId, reason) => moderateEvent(eventId, "Rejected", reason);
+  const addAnnouncement = async (item) => {
+    await request("/api/announcements", { method: "POST", body: JSON.stringify(item) });
+    await refresh();
   };
-
-  const addEvent = (event) => {
-    const newEvent = { ...event, id: Date.now(), registrations: 0, createdDate: new Date().toISOString().slice(0, 10), submittedDate: new Date().toISOString().slice(0, 10) };
-    setEvents((current) => [newEvent, ...current]);
-    addActivity(`Created event ${newEvent.title}`);
-    return newEvent;
+  const updateAnnouncement = async (id, updates) => {
+    await request(`/api/announcements/${id}`, { method: "PATCH", body: JSON.stringify(updates) });
+    await refresh();
   };
-
-  const updateEvent = (eventId, updates) => {
-    setEvents((current) => current.map((event) => String(event.id) === String(eventId) ? { ...event, ...updates } : event));
-    const event = events.find((item) => String(item.id) === String(eventId));
-    addActivity(`Updated event ${event?.title || eventId}`);
+  const deleteAnnouncement = async (id) => {
+    await request(`/api/announcements/${id}`, { method: "DELETE" });
+    await refresh();
   };
+  const unavailable = () => { throw new Error("This feature is not connected to the backend yet."); };
 
-  const deleteEvent = (eventId) => {
-    const event = events.find((item) => String(item.id) === String(eventId));
-    setEvents((current) => current.filter((item) => String(item.id) !== String(eventId)));
-    if (event) addActivity(`Deleted event ${event.title}`);
-  };
-
-  const approveEvent = (eventId) => {
-    const event = events.find((item) => String(item.id) === String(eventId));
-    setEvents((current) => current.map((item) => String(item.id) === String(eventId) ? { ...item, status: "Published", rejectionReason: "" } : item));
-    if (event) addActivity(`Approved ${event.title}`);
-  };
-
-  const rejectEvent = (eventId, reason) => {
-    const event = events.find((item) => String(item.id) === String(eventId));
-    setEvents((current) => current.map((item) => String(item.id) === String(eventId) ? { ...item, status: "Rejected", rejectionReason: reason } : item));
-    if (event) addActivity(`Rejected ${event.title}${reason ? `: ${reason}` : ""}`);
-  };
-
-  const addAnnouncement = (announcement) => {
-    const newAnnouncement = { ...announcement, id: Date.now() };
-    setAnnouncements((current) => [newAnnouncement, ...current]);
-    addActivity(`Created announcement ${newAnnouncement.title}`);
-  };
-
-  const updateAnnouncement = (announcementId, updates) => {
-    setAnnouncements((current) => current.map((item) => String(item.id) === String(announcementId) ? { ...item, ...updates } : item));
-    addActivity(`Updated announcement ${updates.title || announcementId}`);
-  };
-
-  const deleteAnnouncement = (announcementId) => {
-    const announcement = announcements.find((item) => String(item.id) === String(announcementId));
-    setAnnouncements((current) => current.filter((item) => String(item.id) !== String(announcementId)));
-    if (announcement) addActivity(`Deleted announcement ${announcement.title}`);
-  };
-
-  const markNotificationAsRead = (notificationId) => {
-    setNotifications((current) => current.map((item) => String(item.id) === String(notificationId) ? { ...item, read: true } : item));
-  };
-
-  const markAllNotificationsAsRead = () => {
-    setNotifications((current) => current.map((item) => ({ ...item, read: true })));
-  };
-
-  const value = {
-    users, students, organizers, events, registrations, announcements, notifications, activityLogs,
-    addUser, updateUser, deleteUser, updateStudent, updateOrganizer,
-    addEvent, updateEvent, deleteEvent, approveEvent, rejectEvent,
-    addAnnouncement, updateAnnouncement, deleteAnnouncement,
-    markNotificationAsRead, markAllNotificationsAsRead,
-  };
-
-  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
+  return (
+    <AdminContext.Provider value={{
+      users, students, organizers, events, registrations, announcements, notifications, activityLogs,
+      dashboardStats, isLoading, error, refresh, loadRegistrationPage, registrationPage, registrationTotal,
+      loadUserPage, userPage, userTotal,
+      updateUser, deleteUser, updateStudent, updateOrganizer,
+      updateEvent, deleteEvent, approveEvent, rejectEvent,
+      addUser: unavailable, addEvent: unavailable, addAnnouncement,
+      updateAnnouncement, deleteAnnouncement,
+      markNotificationAsRead: unavailable, markAllNotificationsAsRead: unavailable,
+    }}>
+      {children}
+    </AdminContext.Provider>
+  );
 }
 
 export function useAdmin() {

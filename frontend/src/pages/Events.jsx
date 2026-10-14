@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import StudentLayout from "../components/StudentLayout";
-import events from "../data/events";
+import EmptyState from "../components/EmptyState";
 import { useStudent } from "../context/StudentContext";
+import { useAuth } from "../context/AuthContext";
 
 import {
   CalendarDays,
@@ -17,13 +18,52 @@ import {
 import "./Events.css";
 
 function Events() {
+  const { request } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchTerm = searchParams.get("search") ?? "";
   const [selectedCategory, setSelectedCategory] = useState("All Events");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registrationMessage, setRegistrationMessage] = useState("");
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const { savedEvents, registeredEvents, toggleSaveEvent, registerForEvent } = useStudent();
+
+  const loadEvents = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError("");
+    try {
+      const result = await request("/api/events");
+      setEvents((result.events || []).map((event) => {
+        const eventDate = new Date(event.date);
+        const date = eventDate.toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" });
+        const formatTime = (value) => value ? new Date(`1970-01-01T${value}`).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
+        const categoryClass = event.category === "Workshops" ? "workshop" : event.category.toLowerCase();
+        return {
+          ...event,
+          id: event._id || event.id,
+          date,
+          time: `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`,
+          location: event.location,
+          participants: event.capacity ? `${event.registrationCount || 0} / ${event.capacity} participants` : `${event.registrationCount || 0} participants`,
+          bannerClass: `${categoryClass}-banner`,
+        };
+      }));
+    } catch (error) {
+      setLoadError(error.message || "Unable to load events.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [request]);
+
+  useEffect(() => { Promise.resolve().then(loadEvents); }, [loadEvents]);
+
+  useEffect(() => {
+    const selectedId = searchParams.get("event");
+    if (selectedId) Promise.resolve().then(() => setSelectedEvent(events.find((event) => String(event.id) === selectedId) || null));
+  }, [events, searchParams]);
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -39,29 +79,30 @@ function Events() {
   const openEventDetails = (event) => {
     setSelectedEvent(event);
     setRegistrationMessage("");
+    setSearchParams((current) => { const next = new URLSearchParams(current); next.set("event", event.id); return next; });
   };
 
   const closeEventDetails = () => {
     setSelectedEvent(null);
     setRegistrationMessage("");
+    setSearchParams((current) => { const next = new URLSearchParams(current); next.delete("event"); return next; });
   };
 
-  const handleRegister = (eventId) => {
+  const handleRegister = async (eventId) => {
     if (registeredEvents.includes(eventId)) {
       setRegistrationMessage("You are already registered for this event.");
       return;
     }
 
-    const isSuccessful = registerForEvent(eventId);
-
-    if (isSuccessful) {
+    setIsRegistering(true);
+    try {
+      await registerForEvent(eventId);
       setRegistrationMessage("You have successfully registered for this event.");
-      setTimeout(() => {
-        setSelectedEvent(null);
-        setRegistrationMessage("");
-      }, 2000);
-    } else {
-      setRegistrationMessage("You are already registered for this event.");
+      await loadEvents();
+    } catch (error) {
+      setRegistrationMessage(error.message || "Unable to register for this event.");
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -108,7 +149,7 @@ function Events() {
         </div>
 
         <div className="events-grid">
-          {filteredEvents.length > 0 ? (
+          {isLoading ? <div className="no-events" role="status">Loading events...</div> : loadError ? <div className="no-events" role="alert">{loadError}<button type="button" onClick={loadEvents}>Try again</button></div> : filteredEvents.length > 0 ? (
             filteredEvents.map((event) => {
               const isSaved = savedEvents.includes(event.id);
 
@@ -163,10 +204,7 @@ function Events() {
               );
             })
           ) : (
-            <div className="no-events">
-              <h2>No events found</h2>
-              <p>Try a different search or category.</p>
-            </div>
+            <EmptyState title="No events found" description="Try a different search or category." />
           )}
         </div>
 
@@ -226,8 +264,9 @@ function Events() {
                 <button
                   className="register-event-button"
                   onClick={() => handleRegister(selectedEvent.id)}
+                  disabled={isRegistering || registeredEvents.includes(String(selectedEvent.id)) || registeredEvents.includes(selectedEvent.id)}
                 >
-                  {registeredEvents.includes(selectedEvent.id)
+                  {isRegistering ? "Registering..." : (registeredEvents.includes(String(selectedEvent.id)) || registeredEvents.includes(selectedEvent.id))
                     ? "Already Registered"
                     : "Register for Event"}
                 </button>

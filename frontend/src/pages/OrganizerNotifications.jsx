@@ -17,7 +17,7 @@ function OrganizerNotifications() {
   return (
     <OrganizerLayout>
       <div className="organizer-page">
-        <header className="organizer-page-header"><div><span className="organizer-eyebrow">UPDATES</span><h1>Notifications</h1><p>{unreadCount ? `${unreadCount} unread updates` : "You're all caught up."}</p></div></header>
+        <header className="organizer-page-header"><div><span className="organizer-eyebrow">UPDATES</span><h1>Notifications</h1><p>{unreadCount ? `${unreadCount} unread updates` : "Persistent notification delivery is not configured yet."}</p></div></header>
         <section className="organizer-notification-list" aria-label="Organizer notifications">
           {notifications.map((notification) => {
             const Icon = notificationIcons[notification.type] || Bell;

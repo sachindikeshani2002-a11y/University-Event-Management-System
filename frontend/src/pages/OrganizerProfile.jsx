@@ -1,51 +1,35 @@
 import { useState } from "react";
-import { Pencil, Save, X, UserRound, Mail, Building2, BadgeCheck } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { Mail, Pencil, Save, UserRound, X } from "lucide-react";
 import OrganizerLayout from "../components/OrganizerLayout";
 import "./OrganizerProfile.css";
 
-const initialProfile = {
-  name: "Alex Perera",
-  email: "alex.perera@university.edu",
-  department: "Office of Student Affairs",
-  organizerId: "ORG-2026-014",
-};
-
 function OrganizerProfile() {
-  const [profile, setProfile] = useState(initialProfile);
-  const [draft, setDraft] = useState(initialProfile);
+  const { user, updateProfile } = useAuth();
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState("");
-  const fields = [
-    { name: "name", label: "Organizer name", icon: UserRound, type: "text" },
-    { name: "email", label: "Email address", icon: Mail, type: "email" },
-    { name: "department", label: "Faculty / department", icon: Building2, type: "text" },
-    { name: "organizerId", label: "Organizer ID", icon: BadgeCheck, type: "text", readOnly: true },
-  ];
-
-  const saveProfile = (event) => {
-    event.preventDefault();
-    setProfile(draft);
-    setEditing(false);
-    setNotice("Profile changes saved for this session.");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const initials = (user?.name || "Organizer").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+  const save = async (event) => {
+    event.preventDefault(); setSaving(true); setNotice(""); setError("");
+    try { const result = await updateProfile({ name: name.trim(), email: email.trim() }); setName(result.name); setEmail(result.email); setEditing(false); setNotice("Profile updated."); }
+    catch (failure) { setError(failure.message || "Unable to update your profile."); }
+    finally { setSaving(false); }
   };
-
-  const cancelEdit = () => { setDraft(profile); setEditing(false); };
-
-  return (
-    <OrganizerLayout>
-      <div className="organizer-page">
-        <header className="organizer-page-header"><div><span className="organizer-eyebrow">ACCOUNT</span><h1>Organizer Profile</h1><p>Manage your organizer contact information.</p></div>{!editing && <button type="button" className="organizer-button secondary" onClick={() => { setDraft(profile); setEditing(true); }}><Pencil size={15} />Edit Profile</button>}</header>
-        {notice && <div className="organizer-feedback" role="status">{notice}</div>}
-        <section className="organizer-card organizer-profile-card">
-          <div className="organizer-profile-banner"><span className="organizer-profile-avatar">AO</span><div><strong>{profile.name}</strong><span>University Event Organizer</span></div></div>
-          <form className="organizer-profile-form" onSubmit={saveProfile}>
-            {fields.map(({ name, label, icon: Icon, type, readOnly }) => <div className="organizer-profile-field" key={name}><label htmlFor={`profile-${name}`}>{label}</label><div className="organizer-profile-value"><Icon size={16} aria-hidden="true" />{editing && !readOnly ? <input id={`profile-${name}`} type={type} required value={draft[name]} onChange={(event) => setDraft((current) => ({ ...current, [name]: event.target.value }))} /> : <span>{profile[name]}</span>}</div></div>)}
-            {editing && <div className="organizer-form-actions"><button type="button" className="organizer-button secondary" onClick={cancelEdit}><X size={15} />Cancel</button><button type="submit" className="organizer-button"><Save size={15} />Save Profile</button></div>}
-          </form>
-        </section>
-      </div>
-    </OrganizerLayout>
-  );
+  return <OrganizerLayout><div className="organizer-page">
+    <header className="organizer-page-header"><div><span className="organizer-eyebrow">ACCOUNT</span><h1>Organizer Profile</h1><p>Manage your account contact information.</p></div>{!editing && <button type="button" className="organizer-button secondary" onClick={() => setEditing(true)}><Pencil size={15} />Edit Profile</button>}</header>
+    {notice && <div className="organizer-feedback" role="status">{notice}</div>}{error && <div className="organizer-feedback" role="alert">{error}</div>}
+    <section className="organizer-card organizer-profile-card"><div className="organizer-profile-banner"><span className="organizer-profile-avatar">{initials}</span><div><strong>{user?.name}</strong><span>University Event Organizer</span></div></div>
+      <form className="organizer-profile-form" onSubmit={save}>
+        <div className="organizer-profile-field"><label htmlFor="organizer-name">Name</label><div className="organizer-profile-value"><UserRound size={16} />{editing ? <input id="organizer-name" required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} /> : <span>{user?.name}</span>}</div></div>
+        <div className="organizer-profile-field"><label htmlFor="organizer-email">Email address</label><div className="organizer-profile-value"><Mail size={16} />{editing ? <input id="organizer-email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} /> : <span>{user?.email}</span>}</div></div>
+        {editing && <div className="organizer-form-actions"><button type="button" className="organizer-button secondary" onClick={() => { setName(user?.name || ""); setEmail(user?.email || ""); setEditing(false); }}><X size={15} />Cancel</button><button type="submit" className="organizer-button" disabled={saving}><Save size={15} />{saving ? "Saving..." : "Save Profile"}</button></div>}
+      </form>
+    </section>
+  </div></OrganizerLayout>;
 }
 
 export default OrganizerProfile;
