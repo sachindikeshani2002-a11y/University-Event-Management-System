@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   BarChart3,
@@ -14,6 +14,7 @@ import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,9 +61,7 @@ function Login() {
     window.alert("University account authentication will be available after backend integration.");
   };
 
-  const handleRegister = () => {
-    window.alert("Registration will be implemented later.");
-  };
+  const handleRegister = () => navigate("/register");
 
   return (
     <div className="login-page">
@@ -114,6 +113,11 @@ function Login() {
         <p>Login to your account</p>
 
         <form className="login-form" onSubmit={handleSubmit}>
+          {location.state?.registrationSuccess && (
+            <p className="registration-success" role="status">
+              {location.state.registrationSuccess}
+            </p>
+          )}
           {validationMessage && (
             <p className="login-validation" role="alert">
               {validationMessage}

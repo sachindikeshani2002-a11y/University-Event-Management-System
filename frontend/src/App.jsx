@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Calendar from "./pages/Calendar";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import OrganizerEvents from "./pages/OrganizerEvents";
 import CreateEvent from "./pages/CreateEvent";
@@ -45,6 +46,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<RequireGuest><Login /></RequireGuest>} />
+                <Route path="/register" element={<RequireGuest><Register /></RequireGuest>} />
 
                 <Route element={<RequireRole role="student" />}>
                   <Route path="/" element={<StudentDashboard />} />

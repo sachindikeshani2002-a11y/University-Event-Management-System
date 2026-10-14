@@ -75,13 +75,42 @@ export function AuthProvider({ children }) {
     return result.user;
   };
 
+  const register = async ({ name, email, password }) => {
+    let response;
+    try {
+      response = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), password }),
+      });
+    } catch {
+      throw new Error("Unable to reach the authentication server. Check that the backend is running.");
+    }
+
+    let result = {};
+    try {
+      result = await response.json();
+    } catch {
+      // Non-JSON server responses are handled with a safe generic message below.
+    }
+
+    if (!response.ok) {
+      const message = response.status >= 500
+        ? "Registration is temporarily unavailable. Please try again later."
+        : result.message || "Unable to create your account. Please check your details.";
+      throw new Error(message);
+    }
+
+    return result.user;
+  };
+
   const logout = () => {
     clearStoredToken();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
