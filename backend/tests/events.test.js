@@ -12,6 +12,8 @@ test("event APIs enforce organizer roles and ownership", async () => {
     userFindById: User.findById,
     eventCreate: Event.create,
     eventFindById: Event.findById,
+    eventFindOne: Event.findOne,
+    eventFind: Event.find,
     registrationFind: Registration.find,
   };
   const originalSecret = process.env.JWT_SECRET;
@@ -27,7 +29,16 @@ test("event APIs enforce organizer roles and ownership", async () => {
   });
   Event.create = async (values) => { created.push(values); return values; };
   Event.findById = async () => ({ organizer: otherOrganizerId });
-  Registration.find = () => ({ populate: () => ({ sort: async () => [] }) });
+  Event.findOne = async (filter) => filter.organizer === organizerId ? null : null;
+  let registrationOwnerFilter;
+  Event.find = (filter) => {
+    registrationOwnerFilter = filter.organizer;
+    return { select: async () => [] };
+  };
+  Registration.find = () => {
+    const query = { populate: () => query, sort: async () => [] };
+    return query;
+  };
 
   const server = app.listen(0);
   await once(server, "listening");
@@ -52,6 +63,26 @@ test("event APIs enforce organizer roles and ownership", async () => {
     assert.equal(created[0].organizer, organizerId);
     assert.equal(created[0].status, "Pending");
 
+    const editOtherEvent = await fetch(`${base}/api/events/64b000000000000000000099`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token(organizerId)}`, "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+    assert.equal(editOtherEvent.status, 404);
+    const cancelOtherEvent = await fetch(`${base}/api/events/64b000000000000000000099/cancel`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token(organizerId)}` },
+    });
+    assert.equal(cancelOtherEvent.status, 404);
+
+    assert.equal((await fetch(`${base}/api/registrations/organizer`, {
+      headers: { Authorization: `Bearer ${token(organizerId)}` },
+    })).status, 200);
+    assert.equal(registrationOwnerFilter, organizerId);
+    assert.equal((await fetch(`${base}/api/registrations/organizer`, {
+      headers: { Authorization: `Bearer ${token(studentId)}` },
+    })).status, 403);
+
     const denied = await fetch(`${base}/api/events/64b000000000000000000099/registrations`, {
       headers: { Authorization: `Bearer ${token(organizerId)}` },
     });
@@ -61,6 +92,8 @@ test("event APIs enforce organizer roles and ownership", async () => {
     User.findById = originals.userFindById;
     Event.create = originals.eventCreate;
     Event.findById = originals.eventFindById;
+    Event.findOne = originals.eventFindOne;
+    Event.find = originals.eventFind;
     Registration.find = originals.registrationFind;
     if (originalSecret === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = originalSecret;

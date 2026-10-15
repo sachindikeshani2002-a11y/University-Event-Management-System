@@ -36,22 +36,27 @@ router.patch("/users/:id", authenticateToken, authorizeRoles("admin"), async (re
   if ((updates.name && updates.name.length > 120) || (updates.email && updates.email.length > 254)) return res.status(400).json({ message: "Name or email address is too long." });
   if (updates.email && !emailPattern.test(updates.email)) return res.status(400).json({ message: "Please provide a valid email address." });
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select("name email role createdAt");
-    if (!user) return res.status(404).json({ message: "User not found." });
+    if (updates.role && updates.role !== "admin") {
+      const target = await User.findById(req.params.id);
+      if (!target) return res.status(404).json({ message: "User not found." });
+      if (target.role === "admin") return res.status(409).json({ message: "Administrator accounts cannot be demoted through user management." });
+    }
+    const filter = { _id: req.params.id };
+    // Do not let a concurrent role update demote an account after it becomes an administrator.
+    if (updates.role && updates.role !== "admin") filter.role = { $ne: "admin" };
+    const user = await User.findOneAndUpdate(filter, updates, { new: true, runValidators: true }).select("name email role createdAt");
+    if (!user) {
+      const current = await User.findById(req.params.id);
+      if (current && updates.role && updates.role !== "admin" && current.role === "admin") {
+        return res.status(409).json({ message: "Administrator accounts cannot be demoted through user management." });
+      }
+      return res.status(404).json({ message: "User not found." });
+    }
     return res.json({ user });
   } catch (error) {
     if (error.code === 11000) return res.status(409).json({ message: "An account with this email already exists." });
     throw error;
   }
-});
-
-router.patch("/users/:id/role", authenticateToken, authorizeRoles("admin"), async (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: "Invalid user ID." });
-  if (!["student", "organizer", "admin"].includes(req.body?.role)) return res.status(400).json({ message: "Choose a valid account role." });
-  if (req.params.id === req.user.id && req.body.role !== "admin") return res.status(409).json({ message: "You cannot remove your own administrator access." });
-  const user = await User.findByIdAndUpdate(req.params.id, { role: req.body.role }, { new: true, runValidators: true }).select("name email role createdAt");
-  if (!user) return res.status(404).json({ message: "User not found." });
-  return res.json({ user });
 });
 
 module.exports = router;

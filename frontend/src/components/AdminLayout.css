@@ -97,6 +97,7 @@
 .admin-empty { padding: 18px 15px; color: var(--admin-muted); font-size: 14px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
 .admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .admin-form-field { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.admin-form-hint { color: var(--admin-muted); font-size: 12px; line-height: 1.4; }
 .admin-form-field.full { grid-column: 1 / -1; }
 .admin-form-field label { color: #43546d; font-size: 10px; font-weight: 700; }
 .admin-form-field label span { color: #b42331; }

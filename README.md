@@ -80,11 +80,35 @@ The backend authorization middleware exports `authenticateToken` and
 Organizer and admin roles must be assigned through a trusted administrative
 process, never through public registration.
 
+### Bootstrap the first administrator
+
+Public registration remains student-only. To provision an administrator for
+an empty database, set the backend environment as usual and run this local
+command from the backend directory:
+
+```powershell
+npm run bootstrap:admin
+```
+
+The script prompts for the administrator name, email, and password. Password
+input is masked; the existing `User` model hashes it before storage. The
+script checks inside a database transaction that no admin exists and refuses
+to create the first account if one is already present. MongoDB transactions
+must be available, as they are on MongoDB Atlas. Do not put credentials in
+source files or command arguments. This is a local CLI only; it adds no HTTP
+registration endpoint.
+
+To create a development organizer, register a second account through the
+normal student registration flow, sign in as the administrator, open **Admin
+→ Users**, edit the account, choose **Organizer**, and confirm the role
+change. The API rejects role changes by non-admins and prevents existing
+administrator accounts from being demoted through user management.
+
 ## Database-backed event workflows
 
 The event workflow uses the `events` and `registrations` MongoDB collections.
 Mongoose creates indexes for event discovery/ownership and the unique
-student/event registration pair. There is no seed script: newly created
+student/event registration pair. There is no sample-data seed: newly created
 accounts and events are real records, and new events require administrator
 approval before students can discover them.
 
@@ -141,8 +165,8 @@ yet have backend models or APIs; those screens state this limitation. Student
 faculty/year/ID fields and account suspension status are not represented in the
 current User schema, so admin pages do not report seeded values for those
 fields. Saved-event preferences are stored per account in browser local storage
-rather than MongoDB. An initial administrator must be provisioned through a
-trusted database/setup process before admin-only role assignment and event
+rather than MongoDB. An initial administrator must be provisioned using the
+local bootstrap command above before admin-only role assignment and event
 moderation can be used. Frontend component and browser end-to-end test
 infrastructure is not configured. API integration tests use isolated model
 mocks and do not verify a live Atlas deployment.
