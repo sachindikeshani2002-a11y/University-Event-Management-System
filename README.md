@@ -93,10 +93,12 @@ npm run bootstrap:admin
 The script prompts for the administrator name, email, and password. Password
 input is masked; the existing `User` model hashes it before storage. The
 script checks inside a database transaction that no admin exists and refuses
-to create the first account if one is already present. MongoDB transactions
-must be available, as they are on MongoDB Atlas. Do not put credentials in
-source files or command arguments. This is a local CLI only; it adds no HTTP
-registration endpoint.
+to create the first account if one is already present. A unique database claim
+also prevents two simultaneous bootstrap attempts from both creating admins.
+MongoDB transactions must be available, as they are on MongoDB Atlas. The
+script loads `backend/.env` when run from the backend directory and does not
+print its values. Do not put credentials in source files or command arguments.
+This is a local CLI only; it adds no HTTP registration endpoint.
 
 To create a development organizer, register a second account through the
 normal student registration flow, sign in as the administrator, open **Admin

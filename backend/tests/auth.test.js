@@ -110,6 +110,7 @@ test("authentication routes and role authorization", async () => {
       password: "test-password",
     });
     assert.equal(login.status, 200);
+    assert.equal(login.body.user.name, "Alex Student");
     assert.equal(login.body.user.role, "student");
     assert.equal(Object.hasOwn(login.body.user, "password"), false);
     assert.equal(jwt.verify(login.body.token, testSecret).sub, registration.body.user.id);
@@ -121,8 +122,23 @@ test("authentication routes and role authorization", async () => {
       Authorization: `Bearer ${login.body.token}`,
     });
     assert.equal(profile.status, 200);
+    assert.equal(profile.body.user.name, "Alex Student");
     assert.equal(profile.body.user.email, "alex@example.edu");
+    assert.equal(profile.body.user.role, "student");
     assert.equal(Object.hasOwn(profile.body.user, "password"), false);
+
+    const account = users.get("alex@example.edu");
+    for (const role of ["organizer", "admin"]) {
+      account.role = role;
+      const refreshedProfile = await request("/api/auth/me", null, {
+        Authorization: `Bearer ${login.body.token}`,
+      });
+      assert.equal(refreshedProfile.status, 200);
+      assert.equal(refreshedProfile.body.user.name, "Alex Student");
+      assert.equal(refreshedProfile.body.user.email, "alex@example.edu");
+      assert.equal(refreshedProfile.body.user.role, role);
+      assert.equal(Object.hasOwn(refreshedProfile.body.user, "password"), false);
+    }
 
     const badToken = await request("/api/auth/me", null, {
       Authorization: "Bearer invalid-token",

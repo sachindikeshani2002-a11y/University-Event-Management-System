@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useAdmin } from "../context/AdminContext";
 import { useAuth } from "../context/AuthContext";
+import { getUserDisplayName, getUserInitials, getUserRoleLabel } from "../utils/userIdentity";
 import "./AdminLayout.css";
 
 const navigation = [
@@ -35,7 +36,8 @@ function AdminLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { notifications } = useAdmin();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const displayName = getUserDisplayName(user);
   const unreadCount = notifications.filter((item) => !item.read).length;
 
   return (
@@ -68,8 +70,8 @@ function AdminLayout({ children }) {
             <button className="admin-notification-button" type="button" aria-label={`View notifications${unreadCount ? `, ${unreadCount} unread` : ""}`} title="View notifications" onClick={() => navigate("/admin/notifications")}>
               <Bell size={19} aria-hidden="true" />{unreadCount > 0 && <span className="admin-notification-badge">{unreadCount}</span>}
             </button>
-            <Link className="admin-user-summary" to="/admin/profile" aria-label="Admin profile: Admin User">
-              <span className="admin-avatar">AD</span><span className="admin-user-copy"><strong>Admin User</strong><span>Administrator</span></span>
+            <Link className="admin-user-summary" to="/admin/profile" aria-label={`${getUserRoleLabel(user)} profile: ${displayName}`}>
+              <span className="admin-avatar" aria-hidden="true">{getUserInitials(user)}</span><span className="admin-user-copy"><strong>{displayName}</strong><span>{getUserRoleLabel(user)}</span></span>
             </Link>
           </div>
         </header>

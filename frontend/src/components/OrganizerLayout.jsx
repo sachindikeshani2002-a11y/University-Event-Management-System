@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useOrganizer } from "../context/OrganizerContext";
 import { useAuth } from "../context/AuthContext";
+import { getUserDisplayName, getUserInitials, getUserRoleLabel } from "../utils/userIdentity";
 import "./OrganizerLayout.css";
 
 const navigation = [
@@ -42,7 +43,8 @@ function OrganizerLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { notifications } = useOrganizer();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const displayName = getUserDisplayName(user);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
 
   return (
@@ -110,11 +112,11 @@ function OrganizerLayout({ children }) {
               <Bell size={20} aria-hidden="true" />
               {unreadCount > 0 && <span className="organizer-notification-badge">{unreadCount}</span>}
             </button>
-            <Link className="organizer-user" to="/organizer/profile" aria-label="Organizer profile: Alex Perera">
-              <span className="organizer-avatar">AO</span>
+            <Link className="organizer-user" to="/organizer/profile" aria-label={`${getUserRoleLabel(user)} profile: ${displayName}`}>
+              <span className="organizer-avatar" aria-hidden="true">{getUserInitials(user)}</span>
               <span className="organizer-user-copy">
-                <strong>Alex Perera</strong>
-                <span>Organizer</span>
+                <strong>{displayName}</strong>
+                <span>{getUserRoleLabel(user)}</span>
               </span>
             </Link>
           </div>

@@ -1,3 +1,5 @@
+const dns = require("node:dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 require("dotenv").config();
 
 const readline = require("node:readline");
@@ -67,11 +69,25 @@ async function main() {
 
     session = await mongoose.startSession();
     await session.withTransaction(async () => {
+      // A unique claim serializes concurrent bootstrap attempts, including the
+      // case where both transactions initially observe an empty admin set.
+      await mongoose.connection
+        .collection("adminBootstrapLocks")
+        .insertOne({ _id: "first-admin", createdAt: new Date() }, { session });
+
       const adminCount = await User.countDocuments({ role: "admin" }).session(session);
       if (adminCount !== 0) throw new Error("An administrator already exists; bootstrap was not performed.");
       await User.create([{ name, email, password, role: "admin" }], { session });
     });
     process.stdout.write("First administrator created. Sign in through the application to continue setup.\n");
+  } catch (error) {
+    if (error.code === 11000 && error.keyPattern?._id) {
+      throw new Error("The first-administrator bootstrap has already been completed.");
+    }
+    if (error.code === 11000 && (error.keyPattern?.email || error.keyValue?.email)) {
+      throw new Error("An account with that email already exists; no administrator was created.");
+    }
+    throw error;
   } finally {
     interface_.close();
     if (session) await session.endSession();

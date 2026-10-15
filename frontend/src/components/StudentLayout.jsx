@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getUserDisplayName, getUserInitials, getUserRoleLabel } from "../utils/userIdentity";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -18,7 +19,8 @@ import "../pages/StudentDashboard.css";
 function StudentLayout({ children }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const displayName = getUserDisplayName(user);
 
   const handleLogout = () => {
     logout();
@@ -117,17 +119,21 @@ function StudentLayout({ children }) {
               onClick={closeMobileNav}
             >
               <Bell size={21} aria-hidden="true" />
-              <span className="notification-badge" aria-hidden="true">3</span>
             </Link>
 
-            <div className="student-profile">
-              <div className="student-avatar">AP</div>
+            <Link
+              to="/profile"
+              className="student-profile"
+              aria-label={`View profile for ${displayName}, ${getUserRoleLabel(user)}`}
+              onClick={closeMobileNav}
+            >
+              <div className="student-avatar" aria-hidden="true">{getUserInitials(user)}</div>
 
               <div className="student-info">
-                <strong>Asha Perera</strong>
-                <span>Student</span>
+                <strong>{displayName}</strong>
+                <span>{getUserRoleLabel(user)}</span>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 
