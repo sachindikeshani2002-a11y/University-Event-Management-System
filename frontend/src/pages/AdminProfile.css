@@ -1,0 +1,12 @@
+.admin-profile-card { max-width: 680px; overflow: hidden; }
+.admin-profile-banner { display: flex; align-items: center; gap: 12px; padding: 18px; border-bottom: 1px solid #e7edf5; background: #f6f9ff; }
+.admin-profile-avatar { display: grid; width: 48px; height: 48px; place-items: center; border: 3px solid #fff; border-radius: 50%; background: #dceaff; color: #1769e8; font-size: 13px; font-weight: 700; }
+.admin-profile-banner div { display: flex; flex-direction: column; gap: 3px; }
+.admin-profile-banner strong { color: #18243b; font-size: 13px; }
+.admin-profile-banner div span { color: #718097; font-size: 9px; }
+.admin-profile-form { padding: 6px 18px 17px; }
+.admin-profile-field { padding: 12px 0; border-bottom: 1px solid #edf0f4; }
+.admin-profile-field > label { display: block; margin-bottom: 6px; color: #8794a8; font-size: 8px; font-weight: 700; }
+.admin-profile-value { display: flex; align-items: center; gap: 9px; color: #1769e8; }
+.admin-profile-value span, .admin-profile-value input { flex: 1; min-width: 0; color: #344862; font: inherit; font-size: 10px; }
+.admin-profile-value input { min-height: 32px; padding: 6px 8px; border: 1px solid #dfe5ed; border-radius: 5px; }
