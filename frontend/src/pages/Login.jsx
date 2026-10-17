@@ -115,7 +115,11 @@ function Login() {
         <p>Login to your account</p>
 
         <form className="login-form" onSubmit={handleSubmit}>
-          {location.state?.registrationSuccess && <p className="registration-success" role="status">{location.state.registrationSuccess}</p>}
+          {location.state?.registrationSuccess && (
+            <p className="registration-success" role="status">
+              {location.state.registrationSuccess}
+            </p>
+          )}
           {validationMessage && (
             <p className="login-validation" role="alert">
               {validationMessage}

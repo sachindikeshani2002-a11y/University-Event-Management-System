@@ -262,6 +262,7 @@ button {
   color: #207245;
   font-size: 14px;
   line-height: 1.4;
+  text-align: left;
 }
 
 .register-card .login-form > .input-box {
