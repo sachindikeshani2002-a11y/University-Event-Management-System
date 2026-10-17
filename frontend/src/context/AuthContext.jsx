@@ -34,12 +34,12 @@ export function AuthProvider({ children }) {
       .then(async (response) => {
         const result = await response.json();
         if (!response.ok) {
+          if (response.status === 401) clearStoredToken();
           throw new Error(result.message || "Unable to verify the saved session.");
         }
         if (isMounted) setUser(result.user);
       })
       .catch(() => {
-        clearStoredToken();
         if (isMounted) setUser(null);
       })
       .finally(() => {
